@@ -1,63 +1,69 @@
 services:
-  # --- DB (Igual que en prod) ---
+  # -------------------- DATABASE --------------------
   db:
     image: postgres:16-alpine
-    container_name: tienda_db_dev
+    container_name: app_db_dev
     environment:
-      POSTGRES_USER: tienda
-      POSTGRES_PASSWORD: tienda
-      POSTGRES_DB: tienda_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: app_db_dev
     ports:
       - "5432:5432"
     volumes:
       - pg_data_dev:/var/lib/postgresql/data
     networks:
       - dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  # --- BACKEND (Modo Dev - Quarkus) ---
+  # -------------------- BACKEND (QUARKUS DEV) --------------------
   backend:
-    # Usamos una imagen con Maven y JDK instalado, no tu Dockerfile de prod
     image: maven:3.9.6-eclipse-temurin-21
-    container_name: tienda_backend_dev
+    container_name: app_backend_dev
     working_dir: /app
     volumes:
-      - ./backend:/app             # <--- MAGIA: Tu código en vivo dentro del container
-      - maven_repo:/root/.m2       # Caché de librerías
+      - ./backend:/app
+      - maven_repo:/root/.m2
+    environment:
+      QUARKUS_PROFILE: dev
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://db:5432/app_db_dev
+      QUARKUS_DATASOURCE_USERNAME: admin
+      QUARKUS_DATASOURCE_PASSWORD: admin
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: update
     ports:
       - "8080:8080"
-      - "5005:5005"                # Puerto Debug
-    environment:
-      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://db:5432/tienda_db
-      QUARKUS_DATASOURCE_USERNAME: tienda
-      QUARKUS_DATASOURCE_PASSWORD: tienda
-      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: update
-    # Comando para levantar en modo desarrollo
+      - "5005:5005"
     command: bash -c "mvn quarkus:dev -Dquarkus.http.host=0.0.0.0"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - dev-network
 
-  # --- FRONTEND (Modo Dev - Vite) ---
+  # -------------------- FRONTEND (VITE DEV) --------------------
   frontend:
     image: node:20-alpine
-    container_name: tienda_frontend_dev
+    container_name: app_frontend_dev
     working_dir: /app
     volumes:
-      - ./frontend:/app            # <--- MAGIA: Tu código en vivo
-      - /app/node_modules          # Aísla las dependencias de Linux vs Windows
-    ports:
-      - "5173:5173"                # Puerto de Vite (Dev)
+      - ./frontend:/app
+      - /app/node_modules
     environment:
-      - CHOKIDAR_USEPOLLING=true   # Necesario para Hot Reload en Windows
-    # Instala si falta algo y arranca
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - "5173:5173"
     command: sh -c "npm install && npm run dev -- --host"
     networks:
       - dev-network
 
+# -------------------- VOLUMES --------------------
 volumes:
   pg_data_dev:
   maven_repo:
 
+# -------------------- NETWORKS --------------------
 networks:
   dev-network:

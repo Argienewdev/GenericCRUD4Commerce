@@ -1,27 +1,35 @@
-# --- ETAPA 1: BUILD ---
+# -------------------- STAGE 1: BUILD --------------------
+# Use Node.js to build the frontend assets
 FROM node:20-alpine AS builder
 
+# Set working directory
 WORKDIR /app
 
-# Copiamos primero los manifiestos para aprovechar el caché de capas de Docker
+# Copy dependency manifests first to leverage Docker cache
 COPY package*.json ./
+
+# Install dependencies using clean install
 RUN npm ci
 
-# Copiamos el resto del código y construimos
+# Copy the rest of the source code
 COPY . .
-RUN npm run build
-# Nota: Vite/SWC por defecto genera la salida en la carpeta 'dist'
 
-# --- ETAPA 2: PRODUCTION ---
+# Build the production-ready static files
+# Vite outputs them to the "dist" folder by default
+RUN npm run build
+
+# -------------------- STAGE 2: PRODUCTION --------------------
+# Use a minimal Nginx image to serve static files
 FROM nginx:alpine AS production
 
-# Copiamos la configuración personalizada de Nginx
+# Copy custom Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copiamos los archivos compilados desde la etapa anterior
-# Ajusta 'dist' si tu configuración de build usa otra carpeta (ej: 'build')
+# Copy the compiled frontend from the build stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
+# Expose HTTP port
 EXPOSE 80
 
+# Run Nginx in foreground mode
 CMD ["nginx", "-g", "daemon off;"]

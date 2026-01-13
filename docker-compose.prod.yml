@@ -1,0 +1,65 @@
+services:
+  # -------------------- DATABASE --------------------
+  db:
+    image: postgres:16-alpine
+    container_name: app_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASS:-admin}
+      POSTGRES_DB: ${DB_NAME:-app_db}
+    # ports:
+    #   - "5432:5432" # Only if you REALLY need external access
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # -------------------- BACKEND (QUARKUS PROD) --------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: app_backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      QUARKUS_PROFILE: prod
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://db:5432/${DB_NAME:-app_db}
+      QUARKUS_DATASOURCE_USERNAME: ${DB_USER:-mi_usuario}
+      QUARKUS_DATASOURCE_PASSWORD: ${DB_PASS:-mi_password_secreto}
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: validate
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  # -------------------- FRONTEND (NGINX PROD) --------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: app_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+# -------------------- VOLUMES --------------------
+volumes:
+  pg_data:
+
+# -------------------- NETWORKS --------------------
+networks:
+  app-network:
+    driver: bridge

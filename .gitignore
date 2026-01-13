@@ -1,4 +1,6 @@
-# --- GENERAL / OS ---
+# ===============================
+# GENERAL / OS
+# ===============================
 .DS_Store
 Thumbs.db
 Desktop.ini
@@ -6,9 +8,12 @@ Desktop.ini
 tmp/
 temp/
 
-# --- IDE (VS Code) ---
-./backend.zip
-./.vscode/
+# ===============================
+# IDEs & EDITORS
+# ===============================
+
+# VS Code
+.idea/
 .vscode/
 !.vscode/extensions.json
 !.vscode/launch.json
@@ -16,60 +21,74 @@ temp/
 *.code-workspace
 .history/
 
-# --- JAVA & MAVEN (Backend) ---
-# Ignorar carpeta de compilación
+# Zip artifacts accidentally created
+backend.zip
+
+# ===============================
+# JAVA & MAVEN (Backend)
+# ===============================
+
+# Build output
 target/
 **/target/
 
-# Archivos de clase y paquetes
+# Compiled artifacts
 *.class
 *.jar
 *.war
 *.ear
 *.nar
 
-# Logs específicos de actualizaciones o errores
+# JVM crash logs
 hs_err_pid*
 replay_pid*
 
-# Quarkus
+# Quarkus build directories
 .quarkus/
 quarkus-app/
 
-# Wrapper de Maven (Opcional: Generalmente se comitea, pero si quieres ignorarlo descomenta abajo)
+# Maven Wrapper
+# (Usually committed, uncomment if you want to ignore it)
 # !.mvn/wrapper/maven-wrapper.jar
 
-# --- NODE & REACT/VITE (Frontend) ---
-# Dependencias (¡Lo más importante!)
+# ===============================
+# NODE / REACT / VITE (Frontend)
+# ===============================
+
+# Dependencies
 node_modules/
 **/node_modules/
 
-# Logs de npm
+# Package manager logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Archivos de compilación (Build)
+# Production builds
 dist/
 build/
 **/dist/
 
-# Directorios temporales de Vite
+# Vite temp directories
 .vite/
 .vite-temp/
 
-# --- VARIABLES DE ENTORNO (Seguridad) ---
+# ===============================
+# ENVIRONMENT VARIABLES (SECURITY)
+# ===============================
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
 *.env
 
-# --- DOCKER ---
-# Ignorar overrides locales de docker-compose para no subir credenciales mías
+# ===============================
+# DOCKER
+# ===============================
+
+# Local docker-compose overrides (credentials, ports, etc.)
 docker-compose.override.yml
 
-# --- GITHUB AUTOMATION LOGS (Visto en tu árbol) ---
+# ===============================
+# GITHUB / CI AUTOMATION LOGS
+# ===============================
 backend/.github/java-upgrade/**/logs/
