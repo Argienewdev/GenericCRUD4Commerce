@@ -5,9 +5,9 @@ services:
     container_name: app_db
     restart: always
     environment:
-      POSTGRES_USER: ${DB_USER:-admin}
-      POSTGRES_PASSWORD: ${DB_PASS:-admin}
-      POSTGRES_DB: ${DB_NAME:-app_db}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     # ports:
     #   - "5432:5432" # Only if you REALLY need external access
     volumes:
@@ -15,7 +15,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -32,9 +32,9 @@ services:
         condition: service_healthy
     environment:
       QUARKUS_PROFILE: prod
-      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://db:5432/${DB_NAME:-app_db}
-      QUARKUS_DATASOURCE_USERNAME: ${DB_USER:-mi_usuario}
-      QUARKUS_DATASOURCE_PASSWORD: ${DB_PASS:-mi_password_secreto}
+      QUARKUS_DATASOURCE_JDBC_URL: ${DB_JDBC_URL}
+      QUARKUS_DATASOURCE_USERNAME: ${DB_USER}
+      QUARKUS_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: validate
     ports:
       - "8080:8080"
