@@ -1,0 +1,11 @@
+# Ignoramos la carpeta target local (porque compilaremos DENTRO de Docker)
+target/
+
+# Ignoramos archivos de control de versiones y del IDE
+.git/
+.idea/
+.vscode/
+.DS_Store
+
+# Ignoramos archivos de logs si los hubiera
+*.log
