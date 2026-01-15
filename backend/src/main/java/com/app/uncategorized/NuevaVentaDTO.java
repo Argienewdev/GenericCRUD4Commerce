@@ -1,4 +1,5 @@
-package com.app;
+package com.app.uncategorized;
+
 import java.util.List;
 
 public class NuevaVentaDTO {

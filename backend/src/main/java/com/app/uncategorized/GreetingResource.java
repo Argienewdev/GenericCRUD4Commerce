@@ -1,4 +1,4 @@
-package com.app;
+package com.app.uncategorized;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

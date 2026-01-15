@@ -1,4 +1,4 @@
-package com.app;
+package com.app.uncategorized;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;

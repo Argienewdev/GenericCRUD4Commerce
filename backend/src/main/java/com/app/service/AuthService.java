@@ -1,0 +1,133 @@
+package com.app.service;
+
+import com.app.model.Session;
+import com.app.model.User;
+import com.app.repository.SessionRepository;
+import com.app.repository.UserRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import org.jboss.logging.Logger;
+
+import java.util.Optional;
+
+@ApplicationScoped
+public class AuthService {
+
+	private static final Logger LOG = Logger.getLogger(AuthService.class);
+
+	@Inject
+	UserRepository userRepository;
+
+	@Inject
+	SessionRepository sessionRepository;
+
+	@Inject
+	PasswordService passwordService;
+
+	@Transactional
+	public Optional<Session> login(String username, String password) {
+		LOG.infof("Intento de login para usuario: %s", username);
+
+		Optional<User> userOpt = userRepository.findByUsername(username);
+
+		if (userOpt.isEmpty()) {
+			LOG.warnf("Usuario no encontrado: %s", username);
+			return Optional.empty();
+		}
+
+		User user = userOpt.get();
+
+		if (!passwordService.verifyPassword(password, user.getPasswordHash())) {
+			LOG.warnf("Contraseña incorrecta para usuario: %s", username);
+			return Optional.empty();
+		}
+
+		Session session = new Session();
+		session.setUser(user);
+		sessionRepository.persist(session);
+
+		LOG.infof("Login exitoso para usuario: %s (ID: %d, Role: %s). Session ID: %s",
+				username, user.getId(), user.getRole(), session.getId());
+
+		return Optional.of(session);
+	}
+
+	@Transactional
+	public boolean logout(String sessionId) {
+		LOG.infof("Intento de logout. Session ID: %s", sessionId);
+
+		Optional<Session> sessionOpt = sessionRepository.findByIdOptional(sessionId);
+
+		if (sessionOpt.isEmpty()) {
+			LOG.warnf("Sesión no encontrada para logout: %s", sessionId);
+			return false;
+		}
+
+		sessionRepository.delete(sessionOpt.get());
+		LOG.infof("Logout exitoso. Session ID: %s", sessionId);
+
+		return true;
+	}
+
+	public Optional<User> validateSession(String sessionId) {
+		if (sessionId == null || sessionId.isBlank()) {
+			LOG.debug("Session ID vacío en validateSession");
+			return Optional.empty();
+		}
+
+		LOG.debugf("Validando sesión: %s", sessionId);
+
+		Optional<Session> sessionOpt = sessionRepository.findValidSession(sessionId);
+
+		if (sessionOpt.isEmpty()) {
+			LOG.debugf("Sesión inválida o expirada: %s", sessionId);
+			return Optional.empty();
+		}
+
+		Session session = sessionOpt.get();
+		User user = session.getUser();
+
+		if (!user.getActive()) {
+			LOG.warnf("Usuario inactivo intenta usar sesión válida. User ID: %d", user.getId());
+			return Optional.empty();
+		}
+
+		session.updateActivity();
+		sessionRepository.persist(session);
+
+		LOG.debugf("Sesión válida para usuario: %s (ID: %d, Role: %s)",
+				user.getUsername(), user.getId(), user.getRole());
+
+		return Optional.of(user);
+	}
+
+	@Transactional
+	public User createUser(String username, String password, User.Role role) {
+		LOG.infof("Creando nuevo usuario: %s con rol: %s", username, role);
+
+		if (userRepository.existsByUsername(username)) {
+			LOG.errorf("Error: Usuario ya existe: %s", username);
+			throw new IllegalArgumentException("El usuario ya existe");
+		}
+
+		User user = new User();
+		user.setUsername(username);
+		user.setPasswordHash(passwordService.hashPassword(password));
+		user.setRole(role);
+		user.setActive(true);
+
+		userRepository.persist(user);
+
+		LOG.infof("Usuario creado exitosamente: %s (ID: %d)", username, user.getId());
+
+		return user;
+	}
+
+	@Transactional
+	public void cleanExpiredSessions() {
+		LOG.debug("Limpiando sesiones expiradas...");
+		sessionRepository.deleteExpiredSessions();
+		LOG.debug("Limpieza de sesiones completada");
+	}
+}

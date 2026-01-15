@@ -1,4 +1,4 @@
-package com.app;
+package com.app.uncategorized;
 
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
