@@ -1,4 +1,4 @@
-package com.mitienda;
+package com.app;
 import java.util.List;
 
 public class NuevaVentaDTO {

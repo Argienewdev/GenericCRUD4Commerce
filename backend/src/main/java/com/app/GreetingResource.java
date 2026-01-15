@@ -1,4 +1,4 @@
-package com.mitienda;
+package com.app;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

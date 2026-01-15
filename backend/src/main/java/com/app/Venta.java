@@ -1,4 +1,4 @@
-package com.mitienda;
+package com.app;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.CascadeType;

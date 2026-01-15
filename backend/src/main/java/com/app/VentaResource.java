@@ -1,4 +1,4 @@
-package com.mitienda;
+package com.app;
 
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
