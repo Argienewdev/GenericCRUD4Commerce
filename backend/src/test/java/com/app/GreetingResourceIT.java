@@ -1,4 +1,4 @@
-package com.mitienda;
+package com.app;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
