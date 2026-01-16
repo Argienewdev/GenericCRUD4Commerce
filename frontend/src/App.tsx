@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { LoginPage } from './pages/LoginPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { ProtectedRoute } from './components/ProtectedRoute';
+import { Login } from './pages/Login';
+import { Dashboard } from './pages/Dashboard';
+import { ProtectedRoute } from './components/routes/ProtectedRoute';
 import { Role } from './types/auth';
 
 function App() {
@@ -10,13 +10,13 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<Login />} />
 					
           <Route
             path="/dashboard"
             element={ 
 							<ProtectedRoute>
-								<DashboardPage />
+								<Dashboard />
 							</ProtectedRoute> 
 						}
           />
