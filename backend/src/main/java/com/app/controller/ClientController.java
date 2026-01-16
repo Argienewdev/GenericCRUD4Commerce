@@ -17,13 +17,13 @@ public class ClientController {
     @Inject
     ClientRepository repository;
 
-    // Endpoint: GET /clients
+    // Endpoint: GET api/v1/clients
     @GET
     public List<Client> listAll() {
         return repository.listAll();
     }
 
-    // Endpoint: POST /clients
+    // Endpoint: POST api/v1/clients
     @POST
     @Transactional
     public Response create(Client client) {
@@ -40,7 +40,7 @@ public class ClientController {
         return Response.status(Response.Status.CREATED).entity(client).build();
     }
     
-    // Endpoint: GET /clients/dni/{dni}
+    // Endpoint: GET api/v1/clients/dni/{dni}
     @GET
     @Path("/dni/{dni}")
     public Response findByDni(@PathParam("dni") Integer dni) {
@@ -51,5 +51,43 @@ public class ClientController {
         }
         
         return Response.ok(found).build();
+    }
+
+    // Endpoint: PUT api/v1/clients/{id}
+    @PUT
+    @Path("/{id}")
+    @Transactional
+    public Response update(@PathParam("id") Long id, Client datosNuevos) {
+        
+        Client entity = repository.findById(id);
+
+        // 404 Not Found
+        if (entity == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(java.util.Map.of("error", "Cliente no encontrado con id " + id))
+                    .build();
+        }
+
+        entity.name = datosNuevos.name;
+        entity.address = datosNuevos.address;
+        entity.phoneNumber = datosNuevos.phoneNumber;
+
+        return Response.ok(entity).build();
+    }
+
+    // Endpoint: DELETE api/v1/clients/{id}
+    @DELETE
+    @Path("/{id}")
+    @Transactional
+    public Response delete(@PathParam("id") Long id) {
+
+        boolean eliminado = repository.deleteById(id);
+
+        if (!eliminado) {
+            return Response.status(Response.Status.NOT_FOUND).build(); // 404
+        }
+
+        // On success: 204 No Content
+        return Response.noContent().build(); 
     }
 }
