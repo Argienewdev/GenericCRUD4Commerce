@@ -1,18 +1,5 @@
 import { type LucideIcon } from "lucide-react";
 
-export type PanelType =
-	| "stock"
-	| "ventas"
-	| "clientes"
-	| "estadisticas"
-	| "vendedores";
-
-export interface MenuItem {
-	id: PanelType;
-	label: string;
-	icon: LucideIcon;
-}
-
 export interface StockItem {
 	id: number;
 	name: string;
