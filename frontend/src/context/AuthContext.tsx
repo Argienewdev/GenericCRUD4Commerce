@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { type UserInfo, type LoginRequest, type Role } from '../types/auth';
-import { api } from '../services/api.ts';
+import { authService } from '../services/authService';
 
 interface AuthContextType {
   user: UserInfo | null;
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const response = await api.me();
+      const response = await authService.me();
       setUser(response.user);
     } catch (error) {
 			console.log("Error inesperado al obtener datos del usuario: ", error);
@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (credentials: LoginRequest) => {
-    const response = await api.login(credentials);
+    const response = await authService.login(credentials);
     
     if (!response.success || !response.user) {
       throw new Error(response.message);
@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await api.logout();
+      await authService.logout();
     } finally {
       setUser(null);
     }

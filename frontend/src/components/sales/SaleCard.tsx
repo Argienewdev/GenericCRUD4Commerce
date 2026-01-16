@@ -1,7 +1,7 @@
-import { type Venta } from '../../types/dashboard.ts';
+import { type Sale } from '../../types/dashboard.ts';
 
 interface VentaCardProps {
-  venta: Venta;
+  venta: Sale;
   onViewDetail?: (id: number) => void;
 }
 
@@ -23,10 +23,10 @@ export function SaleCard({ venta, onViewDetail }: VentaCardProps) {
               Cliente: <span className="font-medium text-slate-800">{venta.client}</span>
             </span>
             <span>
-              Productos: <span className="font-medium text-slate-800">{venta.productos}</span>
+              Productos: <span className="font-medium text-slate-800">{venta.products}</span>
             </span>
             <span>
-              Vendedor: <span className="font-medium text-slate-800">{venta.vendedor}</span>
+              Vendedor: <span className="font-medium text-slate-800">{venta.seller}</span>
             </span>
           </div>
         </div>

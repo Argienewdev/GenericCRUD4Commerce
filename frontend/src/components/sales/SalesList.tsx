@@ -1,10 +1,10 @@
 // components/ventas/VentasList.tsx
 
-import { type Venta } from '../../types/dashboard.ts';
+import { type Sale } from '../../types/dashboard.ts';
 import { SaleCard } from './SaleCard.tsx'
 
 interface VentasListProps {
-  ventas: Venta[];
+  ventas: Sale[];
   onViewDetail?: (id: number) => void;
 }
 
