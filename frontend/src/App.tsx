@@ -1,11 +1,42 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { LoginPage } from './pages/LoginPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { Role } from './types/auth';
+
 function App() {
   return (
-    <div className="flex h-screen items-center justify-center bg-black">
-      <h1 className="text-3xl font-bold text-red-600">
-        ¡Hola con React + SWC + Tailwind! 🚀
-      </h1>
-    </div>
-  )
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+					
+          <Route
+            path="/dashboard"
+            element={ <DashboardPage /> }
+          />
+
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute requiredRole={Role.ADMIN}>
+                <div className="p-8">
+                  <h1 className="text-2xl font-bold">Gestión de Usuarios (Solo Admin)</h1>
+                </div>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Default redirect */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          
+          {/* Matches non-existing paths */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
