@@ -1,5 +1,3 @@
-// components/ventas/VentasList.tsx
-
 import { type Sale } from '../../types/dashboard.ts';
 import { SaleCard } from './SaleCard.tsx'
 

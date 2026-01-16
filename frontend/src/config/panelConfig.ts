@@ -4,13 +4,12 @@ import {
   Users, 
   BarChart3, 
   UserCog, 
-  type LucideIcon 
 } from "lucide-react";
 import { stockService } from "../services/stockService";
 import { salesService } from "../services/salesService";
 import { clientsService } from "../services/clientsService";
 import { usersService } from "../services/usersService";
-import type { StockItem, Sale, Client } from "../types/dashboard";
+import type { StockItem, Sale, Client, MenuItem } from "../types/dashboard";
 import type { UserInfo } from "../types/auth";
 
 export type PanelType =
@@ -22,10 +21,7 @@ export type PanelType =
 
 type PanelData = StockItem | Sale | Client | UserInfo;
 
-export interface PanelConfig {
-  id: PanelType;
-  label: string;
-  icon: LucideIcon;
+export interface PanelConfig extends MenuItem {
   fetchData?: () => Promise<PanelData[]>;
   newButtonLabel?: string;
   searchPlaceholder?: string;
@@ -75,9 +71,12 @@ export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
   },
 };
 
-export const getMenuItems = () => 
-  Object.values(PANEL_CONFIG).map(({ id, label, icon }) => ({
-    id,
-    label,
-    icon,
-  }));
+export const getMenuItems = (): MenuItem[] =>
+  Object.values(PANEL_CONFIG).map(
+    (item) => ({
+      id: item.id,
+      label: item.label,
+      icon: item.icon,
+    }) as MenuItem
+  );
+ 
