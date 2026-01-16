@@ -1,9 +1,9 @@
 import { Edit2, Trash2 } from "lucide-react";
-import { type Cliente } from "../../types/dashboard";
+import { type Client } from "../../types/dashboard";
 
 interface ClienteCardProps {
-	cliente: Cliente;
-	onEdit?: (cliente: Cliente) => void;
+	cliente: Client;
+	onEdit?: (cliente: Client) => void;
 	onDelete?: (id: number) => void;
 }
 
@@ -13,7 +13,7 @@ export function ClientCard({ cliente, onEdit, onDelete }: ClienteCardProps) {
 			<div className="flex items-start justify-between">
 				<div className="flex-1">
 					<h3 className="text-lg font-semibold text-slate-800">
-						{cliente.nombre} {cliente.apellido}
+						{cliente.name} {cliente.surname}
 					</h3>
 					<div className="grid grid-cols-3 gap-4 mt-3 text-sm">
 						<div>
@@ -22,11 +22,11 @@ export function ClientCard({ cliente, onEdit, onDelete }: ClienteCardProps) {
 						</div>
 						<div>
 							<p className="text-slate-500">Teléfono</p>
-							<p className="font-medium text-slate-800">{cliente.telefono}</p>
+							<p className="font-medium text-slate-800">{cliente.mobile_phone}</p>
 						</div>
 						<div>
 							<p className="text-slate-500">Domicilio</p>
-							<p className="font-medium text-slate-800">{cliente.domicilio}</p>
+							<p className="font-medium text-slate-800">{cliente.address}</p>
 						</div>
 					</div>
 				</div>
