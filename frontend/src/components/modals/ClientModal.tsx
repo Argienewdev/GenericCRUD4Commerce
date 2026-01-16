@@ -1,0 +1,146 @@
+import { useState } from "react";
+import { X } from "lucide-react"; // Usamos el ícono de cerrar
+import type { Client } from "../../types/dashboard";
+
+interface ClientModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (client: Omit<Client, "id">) => Promise<void>; // Omitimos ID porque es nuevo
+}
+
+export function ClientModal({ isOpen, onClose, onSave }: ClientModalProps) {
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: "",
+    apellido: "",
+    domicilio: "",
+    dni: "",
+    telefono: "",
+  });
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await onSave({
+        name: formData.nombre,
+        surname: formData.apellido,
+        address: formData.domicilio,
+        dni: parseInt(formData.dni),
+        phone_number: formData.telefono,
+      });
+      // Limpiamos el formulario al terminar
+      setFormData({ nombre: "", apellido: "", domicilio: "", dni: "", telefono: "" });
+      onClose();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    // 1. Overlay (Fondo oscuro)
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      
+      {/* 2. Ventana Modal */}
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+        
+        {/* Encabezado */}
+        <div className="flex items-center justify-between p-6 border-b border-slate-100">
+          <h2 className="text-xl font-bold text-slate-800">Nuevo Cliente</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Formulario */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          
+          {/* Nombre */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Nombres</label>
+            <input
+              required
+              type="text"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              placeholder="Ej: Juan"
+              value={formData.nombre}
+              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+            />
+          </div>
+
+          {/* Appelido */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Apellidos</label>
+            <input
+              required
+              type="text"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              placeholder="Ej: Pérez"
+              value={formData.apellido}
+              onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
+            />
+          </div>
+
+          {/* DNI */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">DNI (Sin puntos)</label>
+            <input
+              required
+              type="number"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              placeholder="Ej: 30123456"
+              value={formData.dni}
+              onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
+            />
+          </div>
+
+          {/* Dirección */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Domicilio</label>
+            <input
+              type="text"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              placeholder="Ej: Av. Siempre Viva 742"
+              value={formData.domicilio}
+              onChange={(e) => setFormData({ ...formData, domicilio: e.target.value })}
+            />
+          </div>
+
+          {/* Teléfono */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
+            <input
+              type="text"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              placeholder="Ej: +54 9 11..."
+              value={formData.telefono}
+              onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+            />
+          </div>
+
+          {/* Botones de Acción */}
+          <div className="flex gap-3 mt-8 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex justify-center"
+            >
+              {loading ? "Guardando..." : "Guardar Cliente"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

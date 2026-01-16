@@ -70,7 +70,7 @@ public class ClientController {
 
         entity.name = datosNuevos.name;
         entity.address = datosNuevos.address;
-        entity.phoneNumber = datosNuevos.phoneNumber;
+        entity.phone_number = datosNuevos.phone_number;
 
         return Response.ok(entity).build();
     }

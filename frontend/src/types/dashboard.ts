@@ -21,8 +21,8 @@ export interface Client {
 	id: number;
 	name: string;
 	surname: string;
-	dni: string;
-	mobile_phone: string;
+	dni: number;
+	phone_number: string;
 	address: string;
 }
 

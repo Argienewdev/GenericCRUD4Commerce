@@ -1,4 +1,5 @@
 import { Menu, X, Search, Plus } from 'lucide-react';
+//TODO revisar este import
 import { type PanelType } from '../../types/dashboard.ts';
 
 interface HeaderProps {
@@ -6,9 +7,27 @@ interface HeaderProps {
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
   onNewAction?: () => void;
+  showNewButton?: boolean;
 }
 
-export function Header({ activePanel, sidebarOpen, onToggleSidebar, onNewAction }: HeaderProps) {
+export function Header({ 
+  activePanel, 
+  sidebarOpen, 
+  onToggleSidebar, 
+  onNewAction,
+  showNewButton = true
+}: HeaderProps) {
+  const getTitle = () => {
+    switch (activePanel) {
+      case 'stock': return 'Gestión de Stock';
+      case 'ventas': return 'Registro de Ventas';
+      case 'clientes': return 'Cartera de Clientes';
+      case 'vendedores': return 'Equipo de Ventas';
+      case 'estadisticas': return 'Estadísticas Generales';
+      default: return 'Dashboard';
+    }
+  };
+
   const getActionButtonLabel = () => {
     switch (activePanel) {
       case 'stock': return 'Nuevo Producto';
@@ -27,18 +46,18 @@ export function Header({ activePanel, sidebarOpen, onToggleSidebar, onNewAction 
       <div className="flex items-center gap-4">
         <button
           onClick={onToggleSidebar}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-all"
+          className="p-2 hover:bg-slate-100 rounded-lg transition-all text-slate-600"
         >
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
-        <h2 className="text-2xl font-bold text-slate-800 capitalize">
-          {activePanel}
+        <h2 className="text-2xl font-bold text-slate-800">
+          {getTitle()}
         </h2>
       </div>
       
       {/* Right Section */}
       <div className="flex items-center gap-4">
-        <div className="relative">
+        <div className="relative hidden md:block">
           <Search 
             className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" 
             size={20} 
@@ -50,13 +69,13 @@ export function Header({ activePanel, sidebarOpen, onToggleSidebar, onNewAction 
           />
         </div>
         
-        {actionLabel && (
+        {actionLabel && showNewButton && (
           <button 
             onClick={onNewAction}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all shadow-md"
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all shadow-md active:scale-95"
           >
             <Plus size={20} />
-            <span>{actionLabel}</span>
+            <span className="hidden sm:inline">{actionLabel}</span>
           </button>
         )}
       </div>

@@ -16,10 +16,11 @@ public class Client {
     public Long id;
 
     public String name;
+    public String surname;
     public String address;
 
     @Column(unique = true, nullable = false)
     public Integer dni; 
 
-    public String phoneNumber;
+    public String phone_number;
 }
