@@ -22,7 +22,7 @@ public class AuthResource {
 	AuthService authService;
 
 	private static final String SESSION_COOKIE_NAME = "SESSION_ID";
-	private static final int COOKIE_MAX_AGE = -1; // Establishes a session cookie
+	private static final int COOKIE_MAX_AGE = -1;
 
 	@POST
 	@Path("/login")
@@ -30,7 +30,7 @@ public class AuthResource {
 		LOG.infof("POST /api/v1/auth/login - Usuario: %s", request.username());
 
 		try {
-			Optional<Session> sessionOpt = authService.login(request.username(), request.password());
+			Optional<Session> sessionOpt = authService.login(request);
 
 			if (sessionOpt.isEmpty()) {
 				LOG.warnf("Login fallido para usuario: %s", request.username());
@@ -44,7 +44,7 @@ public class AuthResource {
 			NewCookie sessionCookie = new NewCookie.Builder(SESSION_COOKIE_NAME)
 					.value(session.getId())
 					.path("/") // Allows the cookie to be accesible from all domain's paths
-					.maxAge(COOKIE_MAX_AGE)
+					.maxAge(COOKIE_MAX_AGE) // Establishes a session cookie
 					.httpOnly(true)
 					.sameSite(NewCookie.SameSite.LAX)
 					.secure(false) // TODO: update it to true when deployed
@@ -75,7 +75,7 @@ public class AuthResource {
 	public Response logout(@CookieParam(SESSION_COOKIE_NAME) String sessionId) {
 		LOG.infof("POST /api/v1/auth/logout - Session ID: %s", sessionId);
 
-		authService.logout(sessionId);
+		boolean logoutSuccess = authService.logout(sessionId);
 
 		NewCookie deleteCookie = new NewCookie.Builder(SESSION_COOKIE_NAME)
 				.value("")
@@ -86,7 +86,15 @@ public class AuthResource {
 				.secure(false) // TODO: update it to true when deployed
 				.build();
 
-		LOG.infof("Logout completado para Session ID: %s", sessionId);
+		if (!logoutSuccess) {
+			LOG.warnf("Intento de logout fallido - Session ID: %s", sessionId);
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(new ApiResponse(false, "Sesión no encontrada o ya cerrada"))
+					.cookie(deleteCookie)
+					.build();
+		}
+
+		LOG.infof("Logout exitoso - Session ID: %s", sessionId);
 
 		return Response.ok(new ApiResponse(true, "Logout exitoso"))
 				.cookie(deleteCookie)

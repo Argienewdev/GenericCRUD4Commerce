@@ -1,5 +1,7 @@
 package com.app.service;
 
+import com.app.dto.CreateUserRequest;
+import com.app.dto.LoginRequest;
 import com.app.model.Session;
 import com.app.model.User;
 import com.app.repository.SessionRepository;
@@ -26,20 +28,20 @@ public class AuthService {
 	PasswordService passwordService;
 
 	@Transactional
-	public Optional<Session> login(String username, String password) {
-		LOG.infof("Intento de login para usuario: %s", username);
+	public Optional<Session> login(LoginRequest loginRequest) {
+		LOG.infof("Intento de login para usuario: %s", loginRequest.username());
 
-		Optional<User> userOpt = userRepository.findByUsername(username);
+		Optional<User> userOpt = userRepository.findByUsername(loginRequest.username());
 
 		if (userOpt.isEmpty()) {
-			LOG.warnf("Usuario no encontrado: %s", username);
+			LOG.warnf("Usuario no encontrado: %s", loginRequest.username());
 			return Optional.empty();
 		}
 
 		User user = userOpt.get();
 
-		if (!passwordService.verifyPassword(password, user.getPasswordHash())) {
-			LOG.warnf("Contraseña incorrecta para usuario: %s", username);
+		if (!passwordService.verifyPassword(loginRequest.password(), user.getPasswordHash())) {
+			LOG.warnf("Contraseña incorrecta para usuario: %s", loginRequest.username());
 			return Optional.empty();
 		}
 
@@ -48,7 +50,7 @@ public class AuthService {
 		sessionRepository.persist(session);
 
 		LOG.infof("Login exitoso para usuario: %s (ID: %d, Role: %s). Session ID: %s",
-				username, user.getId(), user.getRole(), session.getId());
+				loginRequest.username(), user.getId(), user.getRole(), session.getId());
 
 		return Optional.of(session);
 	}
@@ -103,23 +105,23 @@ public class AuthService {
 	}
 
 	@Transactional
-	public User createUser(String username, String password, User.Role role) {
-		LOG.infof("Creando nuevo usuario: %s con rol: %s", username, role);
+	public User createUser(CreateUserRequest createUserRequest) {
+		LOG.infof("Creando nuevo usuario: %s con rol: %s", createUserRequest.username(), createUserRequest.role());
 
-		if (userRepository.existsByUsername(username)) {
-			LOG.errorf("Error: Usuario ya existe: %s", username);
+		if (userRepository.existsByUsername(createUserRequest.username())) {
+			LOG.errorf("Error: Usuario ya existe: %s", createUserRequest.username());
 			throw new IllegalArgumentException("El usuario ya existe");
 		}
 
 		User user = new User();
-		user.setUsername(username);
-		user.setPasswordHash(passwordService.hashPassword(password));
-		user.setRole(role);
+		user.setUsername(createUserRequest.username());
+		user.setPasswordHash(passwordService.hashPassword(createUserRequest.password()));
+		user.setRole(createUserRequest.role());
 		user.setActive(true);
 
 		userRepository.persist(user);
 
-		LOG.infof("Usuario creado exitosamente: %s (ID: %d)", username, user.getId());
+		LOG.infof("Usuario creado exitosamente: %s (ID: %d)", createUserRequest.username(), user.getId());
 
 		return user;
 	}

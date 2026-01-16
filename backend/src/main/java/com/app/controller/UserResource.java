@@ -39,10 +39,7 @@ public class UserResource {
 				request.username(), request.role());
 
 		try {
-			User user = authService.createUser(
-					request.username(),
-					request.password(),
-					request.role());
+			User user = authService.createUser(request);
 
 			LOG.infof("Usuario creado exitosamente: %s (ID: %d)", user.getUsername(), user.getId());
 
