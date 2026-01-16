@@ -1,5 +1,5 @@
 import { Menu, X, Search, Plus } from 'lucide-react';
-import { type PanelType } from '../../types/dashboard.ts';
+import type { PanelType } from '../../config/panelConfig';
 
 interface HeaderProps {
   activePanel: PanelType;

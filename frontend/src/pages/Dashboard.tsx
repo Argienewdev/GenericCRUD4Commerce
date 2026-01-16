@@ -15,13 +15,11 @@ export function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelType>("stock");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Hooks tipados para cada panel
   const stockPanel = usePanel<StockItem>("stock");
   const salesPanel = usePanel<Sale>("ventas");
   const clientsPanel = usePanel<Client>("clientes");
   const sellersPanel = usePanel<UserInfo>("vendedores");
 
-  // Obtener el panel actual
   const getCurrentPanel = () => {
     switch (activePanel) {
       case "stock":

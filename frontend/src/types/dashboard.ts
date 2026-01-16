@@ -1,4 +1,5 @@
 import { type LucideIcon } from "lucide-react";
+import type { PanelType } from "../config/panelConfig";
 
 export interface StockItem {
 	id: number;
@@ -6,6 +7,12 @@ export interface StockItem {
 	description: string;
 	price: number;
 	stock: number;
+}
+
+export interface MenuItem {
+	id: PanelType;
+	label: string;
+	icon: LucideIcon;
 }
 
 export interface Sale {
