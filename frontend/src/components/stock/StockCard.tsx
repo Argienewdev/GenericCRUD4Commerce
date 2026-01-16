@@ -1,5 +1,3 @@
-// components/stock/StockCard.tsx
-
 import { Edit2, Trash2 } from 'lucide-react';
 import { type StockItem } from '../../types/dashboard.ts';
 

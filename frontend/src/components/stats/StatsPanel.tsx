@@ -1,5 +1,3 @@
-// components/estadisticas/EstadisticasPanel.tsx
-
 import { DollarSign, BarChart3 } from 'lucide-react';
 import { StatsCard } from './StatsCard';
 import { type StatCard } from '../../types/dashboard.ts';

@@ -1,5 +1,3 @@
-// components/stock/StockList.tsx
-
 import { type StockItem } from '../../types/dashboard.ts';
 import { StockCard } from './StockCard.tsx';
 
