@@ -1,132 +1,161 @@
-import { useEffect, useState } from "react";
-import { Package, DollarSign, Users, BarChart3, UserCog } from "lucide-react";
+import { useState } from "react";
 import { Sidebar } from "../components/layout/Sidebar";
 import { Header } from "../components/layout/Header";
 import { StockList } from "../components/stock/StockList";
-import { type Client, type MenuItem, type PanelType, type Sale, type StockItem } from "../types/dashboard";
 import { SalesList } from "../components/sales/SalesList";
 import { ClientsList } from "../components/clients/ClientsList";
 import { StatsPanel } from "../components/stats/StatsPanel";
 import { SellersList } from "../components/sellers/SellersList";
-import { stockService } from "../services/stockService";
+import { usePanel } from "../hooks/usePanel";
+import { getMenuItems, type PanelType } from "../config/panelConfig";
 import type { UserInfo } from "../types/auth";
-
-const menuItems: MenuItem[] = [
-	{ id: "stock", label: "Stock", icon: Package },
-	{ id: "ventas", label: "Ventas", icon: DollarSign },
-	{ id: "clientes", label: "Clientes", icon: Users },
-	{ id: "estadisticas", label: "Estadísticas", icon: BarChart3 },
-	{ id: "vendedores", label: "Vendedores", icon: UserCog },
-];
+import type { Client, Sale, StockItem } from "../types/dashboard";
 
 export function Dashboard() {
-	const [activePanel, setActivePanel] = useState<PanelType>("stock");
-	const [sidebarOpen, setSidebarOpen] = useState(true);
-	const [stockItems, setStockItems] = useState<StockItem[]>([]);
-	const [sales] = useState<Sale[]>([]);
-	const [clients] = useState<Client[]>([]);
-	const [sellers] = useState<UserInfo[]>([]);
+  const [activePanel, setActivePanel] = useState<PanelType>("stock");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-	useEffect(() => {
-		const fetchStock = async () => {
-			try {
-				const data = await stockService.getStock();
-				setStockItems(data);
-			} catch (error) {
-				console.error("Failed to fetch stock", error);
-			}
-  	};
+  // Hooks tipados para cada panel
+  const stockPanel = usePanel<StockItem>("stock");
+  const salesPanel = usePanel<Sale>("ventas");
+  const clientsPanel = usePanel<Client>("clientes");
+  const sellersPanel = usePanel<UserInfo>("vendedores");
 
-  	fetchStock();
-	}, [])
+  // Obtener el panel actual
+  const getCurrentPanel = () => {
+    switch (activePanel) {
+      case "stock":
+        return stockPanel;
+      case "ventas":
+        return salesPanel;
+      case "clientes":
+        return clientsPanel;
+      case "vendedores":
+        return sellersPanel;
+      default:
+        return null;
+    }
+  };
 
-	// Handlers
-	const handleNewAction = () => {
-		console.log(`Crear nuevo ${activePanel}`);
-		// Aquí irá la lógica para abrir modales de creación
-	};
+  const currentPanel = getCurrentPanel();
 
-	const handleEdit = (item: unknown) => {
-		console.log("Editar:", item);
-		// Aquí irá la lógica para editar
-	};
+  // ============================================
+  // HANDLERS
+  // ============================================
 
-	const handleDelete = (id: number) => {
-		console.log("Eliminar:", id);
-		// Aquí irá la lógica para eliminar
-	};
+  const handleNewAction = () => {
+    console.log(`Crear nuevo ${currentPanel?.config.newButtonLabel}`);
+  };
 
-	const handleViewDetail = (id: number) => {
-		console.log("Ver detalle:", id);
-		// Aquí irá la lógica para ver detalles
-	};
+  const handleEdit = (item: unknown) => {
+    console.log("Editar:", item);
+  };
 
-	// Render Content based on active panel
-	const renderContent = () => {
-		switch (activePanel) {
-			case "stock":
-				return (
-					<StockList
-						items={stockItems}
-						onEdit={handleEdit}
-						onDelete={handleDelete}
-					/>
-				);
+  const handleDelete = (id: number) => {
+    if (!currentPanel) return;
 
-			case "ventas":
-				return (
-					<SalesList ventas={sales} onViewDetail={handleViewDetail} />
-				);
+    console.log("Eliminar:", id);
+  };
 
-			case "clientes":
-				return (
-					<ClientsList
-						clientes={clients}
-						onEdit={handleEdit}
-						onDelete={handleDelete}
-					/>
-				);
+  const handleViewDetail = (id: number) => {
+    console.log("Ver detalle:", id);
+  };
 
-			case "estadisticas":
-				return <StatsPanel />;
+  // ============================================
+  // RENDER CONTENT
+  // ============================================
 
-			case "vendedores":
-				return (
-					<SellersList
-						vendedores={sellers}
-						onEdit={handleEdit}
-						onDelete={handleDelete}
-					/>
-				);
+  const renderContent = () => {
+    if (currentPanel?.loading) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
+        </div>
+      );
+    }
 
-			default:
-				return null;
-		}
-	};
+    if (currentPanel?.error) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full gap-4">
+          <div className="text-red-500 text-lg">Error: {currentPanel.error}</div>
+          <button
+            onClick={currentPanel.refetch}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      );
+    }
 
-	return (
-		<div className="flex h-screen bg-slate-50">
-			{/* Sidebar */}
-			<Sidebar
-				isOpen={sidebarOpen}
-				activePanel={activePanel}
-				menuItems={menuItems}
-				onPanelChange={setActivePanel}
-			/>
+    switch (activePanel) {
+      case "stock":
+        return (
+          <StockList
+            items={stockPanel.data}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        );
 
-			{/* Main Content */}
-			<div className="flex-1 flex flex-col overflow-hidden">
-				{/* Header */}
-				<Header
-					activePanel={activePanel}
-					sidebarOpen={sidebarOpen}
-					onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-					onNewAction={handleNewAction}
-				/>
+      case "ventas":
+        return (
+          <SalesList ventas={salesPanel.data} onViewDetail={handleViewDetail} />
+        );
 
-				{/* Content Area */}
-				<div className="flex-1 overflow-y-auto p-6">{renderContent()}</div>
-			</div>
-		</div>
-	);
+      case "clientes":
+        return (
+          <ClientsList
+            clientes={clientsPanel.data}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        );
+
+      case "estadisticas":
+        return <StatsPanel />;
+
+      case "vendedores":
+        return (
+          <SellersList
+            vendedores={sellersPanel.data}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  // ============================================
+  // RENDER
+  // ============================================
+
+  return (
+    <div className="flex h-screen bg-slate-50">
+      {/* Sidebar */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        activePanel={activePanel}
+        menuItems={getMenuItems()}
+        onPanelChange={setActivePanel}
+      />
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <Header
+          activePanel={activePanel}
+          sidebarOpen={sidebarOpen}
+          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+          onNewAction={handleNewAction}
+        />
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto p-6">{renderContent()}</div>
+      </div>
+    </div>
+  );
 }
