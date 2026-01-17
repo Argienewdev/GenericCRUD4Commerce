@@ -1,19 +1,19 @@
-import { type Vendedor } from '../../types/dashboard';
+import { type Seller } from '../../types/dashboard';
 import { SellerCard } from './SellerCard';
 
-interface VendedoresListProps {
-  vendedores: Vendedor[];
-  onEdit?: (vendedor: Vendedor) => void;
+interface SellersListProps {
+  sellers: Seller[];
+  onEdit?: (seller: Seller) => void;
   onDelete?: (id: number) => void;
 }
 
-export function SellersList({ vendedores, onEdit, onDelete }: VendedoresListProps) {
+export function SellersList({ sellers, onEdit, onDelete }: SellersListProps) {
   return (
     <div className="space-y-4">
-      {vendedores.map((vendedor) => (
-        <SellerCard 
-          key={vendedor.id} 
-          vendedor={vendedor}
+      {sellers.map((seller) => (
+        <SellerCard
+          key={seller.id}
+          seller={seller}
           onEdit={onEdit}
           onDelete={onDelete}
         />

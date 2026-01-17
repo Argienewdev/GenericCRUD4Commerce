@@ -11,6 +11,7 @@ import { StatsPanel } from "../components/stats/StatsPanel";
 // Modals
 import { ClientModal } from "../components/modals/ClientModal";
 import { ProductModal } from "../components/modals/ProductModal";
+import { DeleteConfirmationModal } from "../components/modals/DeleteConfirmationModal";
 // Hooks and config
 import { usePanel } from "../hooks/usePanel";
 import { PANEL_CONFIG, getMenuItems, type PanelType } from "../config/panelConfig";
@@ -24,13 +25,20 @@ import type { ApiError } from "../services/apiClient";
 export function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelType>("stock");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Modal Estados
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null); // Estado para el ítem en edición
+
+  // Delete Modal Estados
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   // Hooks de datos
-  const stockPanel = usePanel("stock");
-  const salesPanel = usePanel("ventas");
-  const clientsPanel = usePanel("clientes");
-  const sellersPanel = usePanel("vendedores");
+  const stockPanel = usePanel("stock", { enabled: activePanel === "stock" });
+  const salesPanel = usePanel("ventas", { enabled: activePanel === "ventas" });
+  const clientsPanel = usePanel("clientes", { enabled: activePanel === "clientes" });
+  const sellersPanel = usePanel("vendedores", { enabled: activePanel === "vendedores" });
 
   const staticConfig = PANEL_CONFIG[activePanel];
 
@@ -40,8 +48,9 @@ export function Dashboard() {
   const viewConfig = {
     stock: {
       dataHook: stockPanel,
-      deleteAction: stockService.deleteProduct, // <-- Nuevo: función del servicio
-      createAction: stockService.createProduct, // <-- Nuevo
+      deleteAction: stockService.deleteProduct,
+      createAction: stockService.createProduct,
+      updateAction: stockService.updateProduct, // <-- Acción de actualización
       RenderList: StockList,
       RenderModal: ProductModal
     },
@@ -49,6 +58,7 @@ export function Dashboard() {
       dataHook: clientsPanel,
       deleteAction: clientsService.deleteClient,
       createAction: clientsService.createClient,
+      updateAction: clientsService.updateClient, // <-- Acción de actualización
       RenderList: ClientsList,
       RenderModal: ClientModal
     },
@@ -56,6 +66,7 @@ export function Dashboard() {
       dataHook: salesPanel,
       deleteAction: salesService.deleteSale,
       createAction: salesService.createSale,
+      updateAction: null,
       RenderList: SalesList,
       RenderModal: null
     },
@@ -63,13 +74,15 @@ export function Dashboard() {
       dataHook: sellersPanel,
       deleteAction: usersService.deleteUser,
       createAction: usersService.createUser,
+      updateAction: null,
       RenderList: SellersList,
       RenderModal: null
     },
     estadisticas: {
-      dataHook: { data: [], loading: false, error: null, refetch: () => {} },
+      dataHook: { data: [], loading: false, error: null, refetch: () => { } },
       deleteAction: null,
       createAction: null,
+      updateAction: null,
       RenderList: StatsPanel,
       RenderModal: null
     }
@@ -81,53 +94,68 @@ export function Dashboard() {
   // HANDLERS
   // ============================================
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     if (!currentView.deleteAction) return;
-    if (!confirm("¿Estás seguro de eliminar este registro?")) return;
+    setDeletingId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!currentView.deleteAction || deletingId === null) return;
 
     try {
-      await currentView.deleteAction(id);
+      await currentView.deleteAction(deletingId);
       currentView.dataHook.refetch();
+      // El modal se cierra automáticamente al resolver la promesa en onConfirm
     } catch (e) {
       console.error(e);
       alert("Error al eliminar el registro.");
     }
   };
 
-  const handleCreate = async (data: any) => {
-    if (!currentView.createAction) return;
-
+  // Maneja tanto creación como edición
+  const handleSave = async (data: any) => {
     try {
-      await currentView.createAction(data);
-      
+      if (editingItem && currentView.updateAction) {
+        // ACTUALIZAR
+        await currentView.updateAction(editingItem.id, data);
+      } else if (currentView.createAction) {
+        // CREAR
+        await currentView.createAction(data);
+      }
+
       currentView.dataHook.refetch();
-      setIsModalOpen(false);
-      alert("Creado con éxito");
+      handleCloseModal();
 
     } catch (error: any) {
       console.error(error);
       const apiError = error as ApiError;
-      
-      // Manejo de errores específico
+
       if (apiError.status === 409) {
-         alert("Error: El registro ya existe.");
+        alert("Error: El registro ya existe.");
       } else {
-         alert(apiError.message || "Error al guardar");
+        alert(apiError.message || "Error al guardar");
       }
     }
   };
 
   const handleEdit = (item: any) => {
-    console.log("Editar:", item);
+    setEditingItem(item);
+    setIsModalOpen(true);
   };
 
   const handleNewAction = () => {
     if (currentView.RenderModal) {
+      setEditingItem(null); // Aseguramos que no haya ítem en edición
       setIsModalOpen(true);
     } else if (staticConfig.newButtonLabel) {
       alert(`La creación de ${staticConfig.label} aún no está implementada.`);
-      console.log(`Intento de crear en panel: ${activePanel}`);
     }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingItem(null);
   };
 
   // ============================================
@@ -152,7 +180,7 @@ export function Dashboard() {
           sidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onNewAction={handleNewAction}
-          showNewButton={!!staticConfig.newButtonLabel} 
+          showNewButton={!!staticConfig.newButtonLabel}
         />
 
         <div className="flex-1 overflow-y-auto p-6">
@@ -162,15 +190,15 @@ export function Dashboard() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
             </div>
           )}
-          
+
           {/* ESTADO DE ERROR */}
           {error && (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <div className="text-red-500 text-lg font-medium">
                 Error: {String(error)}
               </div>
-              <button 
-                onClick={refetch} 
+              <button
+                onClick={refetch}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm active:scale-95"
               >
                 Reintentar
@@ -179,27 +207,42 @@ export function Dashboard() {
           )}
 
           {!loading && !error && (
-            <ListComponent 
+            <ListComponent
               items={data}
+              sales={data}
               ventas={data}
               clientes={data}
+              sellers={data}
               vendedores={data}
               onDelete={handleDelete}
-              onEdit={handleEdit}
+              onEdit={handleEdit} // Pasamos la función de editar
               onViewDetail={(id: number) => console.log(id)}
             />
           )}
         </div>
       </div>
 
-      {/* Renderizado Condicional del Modal */}
+      {/* Modal de Edición / Creación */}
       {ModalComponent && (
-        <ModalComponent 
+        <ModalComponent
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSave={handleCreate}
+          onClose={handleCloseModal}
+          onSave={handleSave}
+          // Pasamos props específicas según el panel activo
+          client={activePanel === "clientes" ? editingItem : undefined}
+          product={activePanel === "stock" ? editingItem : undefined}
         />
       )}
+
+      {/* Modal de Eliminación */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={`Eliminar ${activePanel === "clientes" ? "Cliente" : activePanel === "stock" ? "Producto" : "Registro"}`}
+        description={`¿Estás seguro de que deseas eliminar este ${activePanel === "clientes" ? "cliente" : activePanel === "stock" ? "producto" : "registro"
+          }? Esta acción no se puede deshacer.`}
+      />
     </div>
   );
 }

@@ -33,13 +33,13 @@ export function ClientCard({ cliente, onEdit, onDelete }: ClienteCardProps) {
 				<div className="flex gap-2">
 					<button
 						onClick={() => onEdit?.(cliente)}
-						className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+						className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
 					>
 						<Edit2 size={20} />
 					</button>
 					<button
 						onClick={() => onDelete?.(cliente.id)}
-						className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+						className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-all"
 					>
 						<Trash2 size={20} />
 					</button>

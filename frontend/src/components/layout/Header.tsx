@@ -9,10 +9,10 @@ interface HeaderProps {
   showNewButton?: boolean;
 }
 
-export function Header({ 
-  activePanel, 
-  sidebarOpen, 
-  onToggleSidebar, 
+export function Header({
+  activePanel,
+  sidebarOpen,
+  onToggleSidebar,
   onNewAction,
   showNewButton = true
 }: HeaderProps) {
@@ -45,7 +45,7 @@ export function Header({
       <div className="flex items-center gap-4">
         <button
           onClick={onToggleSidebar}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-all text-slate-600"
+          className="p-2 hover:bg-slate-200 rounded-lg transition-all text-slate-600"
         >
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -53,13 +53,13 @@ export function Header({
           {getTitle()}
         </h2>
       </div>
-      
+
       {/* Right Section */}
       <div className="flex items-center gap-4">
         <div className="relative hidden md:block">
-          <Search 
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" 
-            size={20} 
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            size={20}
           />
           <input
             type="text"
@@ -67,9 +67,9 @@ export function Header({
             className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent w-64"
           />
         </div>
-        
+
         {actionLabel && showNewButton && (
-          <button 
+          <button
             onClick={onNewAction}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all shadow-md active:scale-95"
           >

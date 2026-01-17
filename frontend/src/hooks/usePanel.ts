@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { PANEL_CONFIG, type PanelType } from "../config/panelConfig";
 
-export function usePanel<T>(panelType: PanelType) {
+export function usePanel<T>(panelType: PanelType, options?: { enabled?: boolean }) {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { enabled = true } = options || {};
   const config = PANEL_CONFIG[panelType];
 
   /**
-   * Memoize fetchData so its reference is stable
+   * Memorize fetchData so its reference is stable
    */
   const fetchData = useCallback(async () => {
     if (!config.fetchData) return;
@@ -30,11 +31,13 @@ export function usePanel<T>(panelType: PanelType) {
   }, [config, panelType]);
 
   /**
-   * Fetch when panelType changes
+   * Fetch when panelType changes or enabled becomes true
    */
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (enabled) {
+      fetchData();
+    }
+  }, [fetchData, enabled]);
 
   return {
     data,

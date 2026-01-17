@@ -27,7 +27,7 @@ export function Login() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-linear-to from-blue-50 to-indigo-100">
+		<div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100">
 			<div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
 				<div className="text-center mb-8">
 					<h1 className="text-3xl font-bold text-gray-800 mb-2">
@@ -49,7 +49,7 @@ export function Login() {
 							type="text"
 							value={username}
 							onChange={(e) => setUsername(e.target.value)}
-							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
 							placeholder="Ingresa tu usuario"
 							required
 							disabled={isLoading}
@@ -68,7 +68,7 @@ export function Login() {
 							type="password"
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
-							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
 							placeholder="Ingresa tu contraseña"
 							required
 							disabled={isLoading}

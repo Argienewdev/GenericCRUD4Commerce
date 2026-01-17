@@ -1,12 +1,12 @@
 import { type Sale } from '../../types/dashboard.ts';
 import { SaleCard } from './SaleCard.tsx'
 
-interface VentasListProps {
-  ventas: Sale[];
+interface SalesListProps {
+  sales: Sale[];
   onViewDetail?: (id: number) => void;
 }
 
-export function SalesList({ ventas, onViewDetail }: VentasListProps) {
+export function SalesList({ sales, onViewDetail }: SalesListProps) {
   return (
     <div className="space-y-4">
       {/* Date Filters */}
@@ -23,10 +23,10 @@ export function SalesList({ ventas, onViewDetail }: VentasListProps) {
       </div>
 
       {/* Ventas */}
-      {ventas.map((venta) => (
-        <SaleCard 
-          key={venta.id} 
-          venta={venta}
+      {sales.map((sale) => (
+        <SaleCard
+          key={sale.id}
+          sale={sale}
           onViewDetail={onViewDetail}
         />
       ))}

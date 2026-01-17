@@ -41,3 +41,11 @@ export interface StatCard {
 	icon: LucideIcon;
 	color: "green" | "red" | "blue";
 }
+
+export interface Seller {
+	id: number;
+	name: string;
+	email: string;
+	role: string;
+	sales: number;
+}

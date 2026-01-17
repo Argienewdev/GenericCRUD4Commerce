@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import type { StockItem } from "../../types/dashboard";
 
@@ -6,9 +6,10 @@ interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (product: Omit<StockItem, "id">) => Promise<void>;
+  product?: StockItem; // Prop opcional para edición
 }
 
-export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
+export function ProductModal({ isOpen, onClose, onSave, product }: ProductModalProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -16,6 +17,28 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
     price: "",
     stock: "",
   });
+
+  // Efecto para cargar datos si estamos editando
+  useEffect(() => {
+    if (isOpen) {
+      if (product) {
+        setFormData({
+          name: product.name,
+          description: product.description,
+          price: product.price.toString(),
+          stock: product.stock.toString(),
+        });
+      } else {
+        // Limpiar si es nuevo
+        setFormData({
+          name: "",
+          description: "",
+          price: "",
+          stock: "",
+        });
+      }
+    }
+  }, [isOpen, product]);
 
   if (!isOpen) return null;
 
@@ -30,7 +53,7 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock),
       });
-      
+
       // Limpiar y cerrar
       setFormData({ name: "", description: "", price: "", stock: "" });
       onClose();
@@ -44,10 +67,12 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-100">
-          <h2 className="text-xl font-bold text-slate-800">Nuevo Producto</h2>
+          <h2 className="text-xl font-bold text-slate-800">
+            {product ? "Editar Producto" : "Nuevo Producto"}
+          </h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
             <X size={24} />
           </button>
@@ -55,7 +80,7 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
 
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          
+
           {/* Nombre */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Nombre del Producto</label>
@@ -126,7 +151,7 @@ export function ProductModal({ isOpen, onClose, onSave }: ProductModalProps) {
               disabled={loading}
               className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
             >
-              {loading ? "Guardando..." : "Guardar Producto"}
+              {loading ? "Guardando..." : (product ? "Guardar Cambios" : "Guardar Producto")}
             </button>
           </div>
         </form>
