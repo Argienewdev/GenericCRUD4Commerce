@@ -2,7 +2,7 @@ import { useState } from "react";
 // Layout
 import { Sidebar } from "../components/layout/Sidebar";
 import { Header } from "../components/layout/Header";
-// Listas
+// Lists
 import { StockList } from "../components/stock/StockList";
 import { SalesList } from "../components/sales/SalesList";
 import { ClientsList } from "../components/clients/ClientsList";
@@ -11,11 +11,15 @@ import { StatsPanel } from "../components/stats/StatsPanel";
 // Modals
 import { ClientModal } from "../components/modals/ClientModal";
 import { ProductModal } from "../components/modals/ProductModal";
-// Configuración y Hooks
+// Hooks and config
 import { usePanel } from "../hooks/usePanel";
 import { PANEL_CONFIG, getMenuItems, type PanelType } from "../config/panelConfig";
-
-const API_BASE_URL = "http://localhost:8080/api/v1/";
+//Services
+import { stockService } from "../services/stockService";
+import { clientsService } from "../services/clientsService";
+import { salesService } from "../services/salesService";
+import { usersService } from "../services/usersService";
+import type { ApiError } from "../services/apiClient";
 
 export function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelType>("stock");
@@ -36,31 +40,36 @@ export function Dashboard() {
   const viewConfig = {
     stock: {
       dataHook: stockPanel,
-      endpoint: `${API_BASE_URL}/products`,
+      deleteAction: stockService.deleteProduct, // <-- Nuevo: función del servicio
+      createAction: stockService.createProduct, // <-- Nuevo
       RenderList: StockList,
       RenderModal: ProductModal
     },
     clientes: {
       dataHook: clientsPanel,
-      endpoint: `${API_BASE_URL}/clients`,
+      deleteAction: clientsService.deleteClient,
+      createAction: clientsService.createClient,
       RenderList: ClientsList,
       RenderModal: ClientModal
     },
     ventas: {
       dataHook: salesPanel,
-      endpoint: `${API_BASE_URL}/sales`,
+      deleteAction: salesService.deleteSale,
+      createAction: salesService.createSale,
       RenderList: SalesList,
       RenderModal: null
     },
     vendedores: {
       dataHook: sellersPanel,
-      endpoint: `${API_BASE_URL}/sellers`,
+      deleteAction: usersService.deleteUser,
+      createAction: usersService.createUser,
       RenderList: SellersList,
       RenderModal: null
     },
     estadisticas: {
       dataHook: { data: [], loading: false, error: null, refetch: () => {} },
-      endpoint: null,
+      deleteAction: null,
+      createAction: null,
       RenderList: StatsPanel,
       RenderModal: null
     }
@@ -73,48 +82,38 @@ export function Dashboard() {
   // ============================================
 
   const handleDelete = async (id: number) => {
-    if (!currentView.endpoint) return;
+    if (!currentView.deleteAction) return;
     if (!confirm("¿Estás seguro de eliminar este registro?")) return;
 
     try {
-      const response = await fetch(`${currentView.endpoint}/${id}`, { method: "DELETE" });
-      if (response.ok) {
-        currentView.dataHook.refetch();
-      } else {
-        alert("Error al eliminar");
-      }
+      await currentView.deleteAction(id);
+      currentView.dataHook.refetch();
     } catch (e) {
       console.error(e);
-      alert("Error de conexión");
+      alert("Error al eliminar el registro.");
     }
   };
 
   const handleCreate = async (data: any) => {
-    if (!currentView.endpoint) return;
+    if (!currentView.createAction) return;
 
     try {
-      const response = await fetch(currentView.endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        if (response.status === 409) {
-          const err = await response.json();
-          alert(err.error || "Dato duplicado");
-        } else {
-          throw new Error("Error al crear");
-        }
-        return;
-      }
-
+      await currentView.createAction(data);
+      
       currentView.dataHook.refetch();
       setIsModalOpen(false);
       alert("Creado con éxito");
-    } catch (error) {
+
+    } catch (error: any) {
       console.error(error);
-      alert("Error al guardar");
+      const apiError = error as ApiError;
+      
+      // Manejo de errores específico
+      if (apiError.status === 409) {
+         alert("Error: El registro ya existe.");
+      } else {
+         alert(apiError.message || "Error al guardar");
+      }
     }
   };
 
