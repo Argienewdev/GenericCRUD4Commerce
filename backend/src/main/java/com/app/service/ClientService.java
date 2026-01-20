@@ -86,7 +86,7 @@ public class ClientService {
 
 		entity.name = newData.name;
 		entity.address = newData.address;
-		entity.phone_number = newData.phone_number;
+		entity.phoneNumber = newData.phoneNumber;
 
 		clientRepository.persist(entity);
 

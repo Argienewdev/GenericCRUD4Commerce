@@ -9,8 +9,9 @@ import java.util.UUID;
 public class Session {
 
 	@Id
-	@Column(length = 36, nullable = false, updatable = false)
-	private String id;
+	@GeneratedValue
+	@Column(nullable = false, updatable = false)
+	private UUID id;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id", nullable = false)
@@ -27,9 +28,6 @@ public class Session {
 
 	@PrePersist
 	protected void onCreate() {
-		if (id == null) {
-			id = UUID.randomUUID().toString();
-		}
 		createdAt = LocalDateTime.now();
 		lastActivity = LocalDateTime.now();
 		expiresAt = LocalDateTime.now().plusHours(24);
@@ -43,12 +41,8 @@ public class Session {
 		lastActivity = LocalDateTime.now();
 	}
 
-	public String getId() {
+	public UUID getId() {
 		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public User getUser() {
@@ -63,23 +57,11 @@ public class Session {
 		return createdAt;
 	}
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
 	public LocalDateTime getExpiresAt() {
 		return expiresAt;
 	}
 
-	public void setExpiresAt(LocalDateTime expiresAt) {
-		this.expiresAt = expiresAt;
-	}
-
 	public LocalDateTime getLastActivity() {
 		return lastActivity;
-	}
-
-	public void setLastActivity(LocalDateTime lastActivity) {
-		this.lastActivity = lastActivity;
 	}
 }

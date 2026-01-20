@@ -42,7 +42,7 @@ public class AuthController {
 			Session session = sessionOpt.get();
 
 			NewCookie sessionCookie = new NewCookie.Builder(SESSION_COOKIE_NAME)
-					.value(session.getId())
+					.value(session.getId().toString())
 					.path("/") // Allows the cookie to be accesible from all domain's paths
 					.maxAge(COOKIE_MAX_AGE) // Establishes a session cookie
 					.httpOnly(true)

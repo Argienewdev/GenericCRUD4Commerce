@@ -26,8 +26,8 @@ public class Client {
     public String address;
 
     @Column(unique = true, nullable = false)
-    public Integer dni; 
+    public String dni; 
 
-		@Column(nullable = false)
-    public String phone_number;
+		@Column(name = "phone_number", nullable = false)
+    public String phoneNumber;
 }
