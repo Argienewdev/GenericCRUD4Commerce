@@ -40,12 +40,12 @@ public class ClientController {
 
 	@POST
 	public Response create(Client client) {
-		LOG.infof("POST /api/v1/clients - DNI: %d, Nombre: %s",
+		LOG.infof("POST /api/v1/clients - DNI: %s, Nombre: %s",
 				client.dni, client.name);
-
+		
 		try {
 			Client createdClient = clientService.createClient(client);
-			LOG.infof("Cliente creado exitosamente - ID: %d, DNI: %d",
+			LOG.infof("Cliente creado exitosamente - ID: %d, DNI: %s",
 					createdClient.id, createdClient.dni);
 
 			return Response.status(Response.Status.CREATED)
@@ -57,7 +57,7 @@ public class ClientController {
 					.entity(new ApiResponse(false, e.getMessage()))
 					.build();
 		} catch (Exception e) {
-			LOG.errorf(e, "Error al crear cliente con DNI: %d", client.dni);
+			LOG.errorf(e, "Error al crear cliente con DNI: %s", client.dni);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(new ApiResponse(false, "Error interno del servidor"))
 					.build();
@@ -66,24 +66,24 @@ public class ClientController {
 
 	@GET
 	@Path("/dni/{dni}")
-	public Response findByDni(@PathParam("dni") Integer dni) {
-		LOG.debugf("GET /api/v1/clients/dni/%d", dni);
+	public Response findByDni(@PathParam("dni") String dni) {
+		LOG.debugf("GET /api/v1/clients/dni/%s", dni);
 
 		try {
 			Optional<Client> clientOpt = clientService.getClientByDni(dni);
 
 			if (clientOpt.isEmpty()) {
-				LOG.debugf("Cliente no encontrado con DNI: %d", dni);
+				LOG.debugf("Cliente no encontrado con DNI: %s", dni);
 				return Response.status(Response.Status.NOT_FOUND)
 						.entity(new ApiResponse(false, "Cliente no encontrado"))
 						.build();
 			}
 
 			Client client = clientOpt.get();
-			LOG.debugf("Cliente encontrado - ID: %d, DNI: %d", client.id, dni);
+			LOG.debugf("Cliente encontrado - ID: %d, DNI: %s", client.id, dni);
 			return Response.ok(client).build();
 		} catch (Exception e) {
-			LOG.errorf(e, "Error al buscar cliente por DNI: %d", dni);
+			LOG.errorf(e, "Error al buscar cliente por DNI: %s", dni);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(new ApiResponse(false, "Error interno del servidor"))
 					.build();
@@ -107,7 +107,7 @@ public class ClientController {
 			}
 
 			Client client = updatedClient.get();
-			LOG.infof("Cliente actualizado exitosamente - ID: %d, DNI: %d",
+			LOG.infof("Cliente actualizado exitosamente - ID: %d, DNI: %s",
 					client.id, client.dni);
 
 			return Response.ok(client).build();

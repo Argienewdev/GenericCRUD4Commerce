@@ -30,29 +30,35 @@ public class ClientService {
 
 	@Transactional
 	public Client createClient(Client client) {
-		LOG.infof("Creando cliente: DNI %d, Nombre: %s", client.dni, client.name);
+		System.out.println("aaa");
+				System.out.println(client.dni);
+		System.out.println(client.address);
+		System.out.println(client.phoneNumber);
+		System.out.println(client.surname);
+		System.out.println(client.name);
+		LOG.infof("Creando cliente: DNI %s, Nombre: %s", client.dni, client.name);
 
 		if (clientRepository.existsByDni(client.dni)) {
-			LOG.warnf("Intento de crear cliente con DNI duplicado: %d", client.dni);
+			LOG.warnf("Intento de crear cliente con DNI duplicado: %s", client.dni);
 			throw new IllegalArgumentException("Ya existe un cliente registrado con el DNI " + client.dni);
 		}
 
 		clientRepository.persist(client);
 
-		LOG.infof("Cliente creado exitosamente - ID: %d, DNI: %d", client.id, client.dni);
+		LOG.infof("Cliente creado exitosamente - ID: %d, DNI: %s", client.id, client.dni);
 
 		return client;
 	}
 
-	public Optional<Client> getClientByDni(Integer dni) {
-		LOG.debugf("Buscando cliente por DNI: %d", dni);
+	public Optional<Client> getClientByDni(String dni) {
+		LOG.debugf("Buscando cliente por DNI: %s", dni);
 
 		Optional<Client> clientOpt = clientRepository.findByDni(dni);
 
 		if (clientOpt.isEmpty()) {
-			LOG.debugf("Cliente no encontrado con DNI: %d", dni);
+			LOG.debugf("Cliente no encontrado con DNI: %s", dni);
 		} else {
-			LOG.debugf("Cliente encontrado - ID: %d, DNI: %d", clientOpt.get().id, dni);
+			LOG.debugf("Cliente encontrado - ID: %d, DNI: %s", clientOpt.get().id, dni);
 		}
 
 		return clientOpt;
@@ -90,7 +96,7 @@ public class ClientService {
 
 		clientRepository.persist(entity);
 
-		LOG.infof("Cliente actualizado exitosamente - ID: %d, DNI: %d",
+		LOG.infof("Cliente actualizado exitosamente - ID: %d, DNI: %s",
 				entity.id, entity.dni);
 
 		return Optional.of(entity);

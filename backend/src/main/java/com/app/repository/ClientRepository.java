@@ -9,11 +9,11 @@ import java.util.Optional;
 @ApplicationScoped
 public class ClientRepository implements PanacheRepository<Client> {
 
-	public Optional<Client> findByDni(int dni) {
+	public Optional<Client> findByDni(String dni) {
 		return find("dni", dni).firstResultOptional();
 	}
 
-	public boolean existsByDni(int dni) {
+	public boolean existsByDni(String dni) {
 		return count("dni", dni) > 0;
 	}
 }

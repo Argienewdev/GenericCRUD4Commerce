@@ -12,30 +12,30 @@ interface ClientModalProps {
 export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    domicilio: "",
+    name: "",
+    surname: "",
+    address: "",
     dni: "",
-    telefono: "",
+    phoneNumber: "",
   });
 
   useEffect(() => {
     if (isOpen) {
       if (client) {
         setFormData({
-          nombre: client.name,
-          apellido: client.surname,
-          domicilio: client.address,
+          name: client.name,
+          surname: client.surname,
+          address: client.address,
           dni: client.dni.toString(),
-          telefono: client.phone_number,
+          phoneNumber: client.phoneNumber,
         });
       } else {
         setFormData({
-          nombre: "",
-          apellido: "",
-          domicilio: "",
+          name: "",
+          surname: "",
+          address: "",
           dni: "",
-          telefono: "",
+          phoneNumber: "",
         });
       }
     }
@@ -47,15 +47,16 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
     e.preventDefault();
     setLoading(true);
     try {
+			console.log(formData);
       await onSave({
-        name: formData.nombre,
-        surname: formData.apellido,
-        address: formData.domicilio,
+        name: formData.name,
+        surname: formData.surname,
+        address: formData.address,
         dni: parseInt(formData.dni),
-        phone_number: formData.telefono,
+        phoneNumber: formData.phoneNumber,
       });
       // Limpiamos el formulario al terminar
-      setFormData({ nombre: "", apellido: "", domicilio: "", dni: "", telefono: "" });
+      setFormData({ name: "", surname: "", address: "", dni: "", phoneNumber: "" });
       onClose();
     } catch (error) {
       console.error(error);
@@ -92,8 +93,8 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
               type="text"
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
               placeholder="Ej: Juan"
-              value={formData.nombre}
-              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
           </div>
 
@@ -105,8 +106,8 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
               type="text"
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
               placeholder="Ej: Pérez"
-              value={formData.apellido}
-              onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
+              value={formData.surname}
+              onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
             />
           </div>
 
@@ -137,8 +138,8 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
               type="text"
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
               placeholder="Ej: Av. Siempre Viva 742"
-              value={formData.domicilio}
-              onChange={(e) => setFormData({ ...formData, domicilio: e.target.value })}
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             />
           </div>
 
@@ -149,8 +150,8 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
               type="text"
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
               placeholder="Ej: +54 9 11..."
-              value={formData.telefono}
-              onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+              value={formData.phoneNumber}
+              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
             />
           </div>
 
