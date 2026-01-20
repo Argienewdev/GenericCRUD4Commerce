@@ -11,23 +11,23 @@ import jakarta.persistence.Table;
 @Table(name = "clients")
 public class Client {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-		@Column(updatable = false)
-    public Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(updatable = false)
+  public Long id;
 
-		@Column(nullable = false)
-    public String name;
-		
-		@Column(nullable = false)
-    public String surname;
+  @Column(nullable = false)
+  public String name;
 
-		@Column(nullable = false)
-    public String address;
+  @Column(nullable = false)
+  public String surname;
 
-    @Column(unique = true, nullable = false)
-    public String dni; 
+  @Column(nullable = false)
+  public String address;
 
-		@Column(name = "phone_number", nullable = false)
-    public String phoneNumber;
+  @Column(unique = true, nullable = false)
+  public String dni;
+
+  @Column(name = "phone_number", nullable = false)
+  public String phone_number;
 }

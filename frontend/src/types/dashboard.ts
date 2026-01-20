@@ -29,7 +29,7 @@ export interface Client {
 	name: string;
 	surname: string;
 	dni: number;
-	phoneNumber: string;
+	phone_number: string;
 	address: string;
 }
 

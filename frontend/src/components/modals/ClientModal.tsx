@@ -16,7 +16,7 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
     surname: "",
     address: "",
     dni: "",
-    phoneNumber: "",
+    phone_number: "",
   });
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
           surname: client.surname,
           address: client.address,
           dni: client.dni.toString(),
-          phoneNumber: client.phoneNumber,
+          phone_number: client.phone_number,
         });
       } else {
         setFormData({
@@ -35,7 +35,7 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
           surname: "",
           address: "",
           dni: "",
-          phoneNumber: "",
+          phone_number: "",
         });
       }
     }
@@ -47,16 +47,16 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
     e.preventDefault();
     setLoading(true);
     try {
-			console.log(formData);
+      console.log(formData);
       await onSave({
         name: formData.name,
         surname: formData.surname,
         address: formData.address,
         dni: parseInt(formData.dni),
-        phoneNumber: formData.phoneNumber,
+        phone_number: formData.phone_number,
       });
       // Limpiamos el formulario al terminar
-      setFormData({ name: "", surname: "", address: "", dni: "", phoneNumber: "" });
+      setFormData({ name: "", surname: "", address: "", dni: "", phone_number: "" });
       onClose();
     } catch (error) {
       console.error(error);
@@ -150,8 +150,8 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
               type="text"
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
               placeholder="Ej: +54 9 11..."
-              value={formData.phoneNumber}
-              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+              value={formData.phone_number}
+              onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
             />
           </div>
 

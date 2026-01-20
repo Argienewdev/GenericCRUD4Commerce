@@ -31,9 +31,9 @@ public class ClientService {
 	@Transactional
 	public Client createClient(Client client) {
 		System.out.println("aaa");
-				System.out.println(client.dni);
+		System.out.println(client.dni);
 		System.out.println(client.address);
-		System.out.println(client.phoneNumber);
+		System.out.println(client.phone_number);
 		System.out.println(client.surname);
 		System.out.println(client.name);
 		LOG.infof("Creando cliente: DNI %s, Nombre: %s", client.dni, client.name);
@@ -92,7 +92,7 @@ public class ClientService {
 
 		entity.name = newData.name;
 		entity.address = newData.address;
-		entity.phoneNumber = newData.phoneNumber;
+		entity.phone_number = newData.phone_number;
 
 		clientRepository.persist(entity);
 
