@@ -33,7 +33,7 @@ public class ClientService {
 		System.out.println("aaa");
 		System.out.println(client.dni);
 		System.out.println(client.address);
-		System.out.println(client.phone_number);
+		System.out.println(client.phoneNumber);
 		System.out.println(client.surname);
 		System.out.println(client.name);
 		LOG.infof("Creando cliente: DNI %s, Nombre: %s", client.dni, client.name);
@@ -92,7 +92,7 @@ public class ClientService {
 
 		entity.name = newData.name;
 		entity.address = newData.address;
-		entity.phone_number = newData.phone_number;
+		entity.phoneNumber = newData.phoneNumber;
 
 		clientRepository.persist(entity);
 

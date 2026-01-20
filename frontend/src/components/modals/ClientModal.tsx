@@ -16,7 +16,7 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
     surname: "",
     address: "",
     dni: "",
-    phone_number: "",
+    phoneNumber: "",
   });
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
           surname: client.surname,
           address: client.address,
           dni: client.dni.toString(),
-          phone_number: client.phone_number,
+          phoneNumber: client.phoneNumber,
         });
       } else {
         setFormData({
@@ -35,7 +35,7 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
           surname: "",
           address: "",
           dni: "",
-          phone_number: "",
+          phoneNumber: "",
         });
       }
     }
@@ -53,10 +53,10 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
         surname: formData.surname,
         address: formData.address,
         dni: parseInt(formData.dni),
-        phone_number: formData.phone_number,
+        phoneNumber: formData.phoneNumber,
       });
       // Limpiamos el formulario al terminar
-      setFormData({ name: "", surname: "", address: "", dni: "", phone_number: "" });
+      setFormData({ name: "", surname: "", address: "", dni: "", phoneNumber: "" });
       onClose();
     } catch (error) {
       console.error(error);
@@ -150,8 +150,8 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
               type="text"
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
               placeholder="Ej: +54 9 11..."
-              value={formData.phone_number}
-              onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+              value={formData.phoneNumber}
+              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
             />
           </div>
 

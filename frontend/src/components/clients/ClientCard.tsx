@@ -22,7 +22,7 @@ export function ClientCard({ cliente, onEdit, onDelete }: ClienteCardProps) {
 						</div>
 						<div>
 							<p className="text-slate-500">Teléfono</p>
-							<p className="font-medium text-slate-800">{cliente.phone_number}</p>
+							<p className="font-medium text-slate-800">{cliente.phoneNumber}</p>
 						</div>
 						<div>
 							<p className="text-slate-500">Domicilio</p>
