@@ -26,8 +26,8 @@ export function Sidebar({ isOpen, activePanel, menuItems, onPanelChange }: Sideb
     <div className="w-64 bg-white shadow-lg transition-all duration-300 flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-slate-200">
-        <h1 className="text-2xl font-bold text-blue-600">StockPro</h1>
-        <p className="text-sm text-slate-500 mt-1">Sistema de Gestión</p>
+        <h1 className="text-2xl font-bold text-blue-600">StockApp</h1>
+        <p className="text-sm text-slate-500 mt-1">Sistema de Gestión de Stock</p>
       </div>
 
       {/* Navigation */}
@@ -63,7 +63,7 @@ export function Sidebar({ isOpen, activePanel, menuItems, onPanelChange }: Sideb
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg transition-all"
+          className="w-full flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg transition-all mb-5"
         >
           <LogOut size={18} />
           <span>Cerrar Sesión</span>

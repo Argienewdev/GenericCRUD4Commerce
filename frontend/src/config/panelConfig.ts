@@ -25,12 +25,14 @@ export interface PanelConfig extends MenuItem {
   fetchData?: () => Promise<PanelData[]>;
   newButtonLabel?: string;
   searchPlaceholder?: string;
+	pageTitle: string;
 }
 
 export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
   stock: {
     id: "stock",
     label: "Stock",
+		pageTitle: "Gestión de Stock",
     icon: Package,
     fetchData: () => stockService.getStock(),
     newButtonLabel: "Nuevo Producto",
@@ -40,6 +42,7 @@ export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
   ventas: {
     id: "ventas",
     label: "Ventas",
+		pageTitle: "Registro de Ventas",
     icon: DollarSign,
     fetchData: () => salesService.getSales(),
     newButtonLabel: "Nueva Venta",
@@ -49,6 +52,7 @@ export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
   clientes: {
     id: "clientes",
     label: "Clientes",
+		pageTitle: "Cartera de Clientes",
     icon: Users,
     fetchData: () => clientsService.getClients(),
     newButtonLabel: "Nuevo Cliente",
@@ -58,12 +62,14 @@ export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
   estadisticas: {
     id: "estadisticas",
     label: "Estadísticas",
+		pageTitle: "Estadísticas Generales",
     icon: BarChart3,
   },
   
   vendedores: {
     id: "vendedores",
     label: "Vendedores",
+		pageTitle: "Equipo de Ventas",
     icon: UserCog,
     fetchData: () => usersService.getUsers(),
     newButtonLabel: "Nuevo Vendedor",
