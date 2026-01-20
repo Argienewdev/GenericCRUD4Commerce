@@ -13,14 +13,21 @@ public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+		@Column(updatable = false)
     public Long id;
 
+		@Column(nullable = false)
     public String name;
+		
+		@Column(nullable = false)
     public String surname;
+
+		@Column(nullable = false)
     public String address;
 
     @Column(unique = true, nullable = false)
     public Integer dni; 
 
+		@Column(nullable = false)
     public String phone_number;
 }

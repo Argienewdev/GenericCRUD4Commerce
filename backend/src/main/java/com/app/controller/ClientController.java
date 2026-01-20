@@ -1,93 +1,146 @@
 package com.app.controller;
 
+import com.app.dto.ApiResponse;
 import com.app.model.Client;
-import com.app.repository.ClientRepository;
+import com.app.service.ClientService;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.List;
+import org.jboss.logging.Logger;
 
-@Path("api/v1/clients")
+import java.util.List;
+import java.util.Optional;
+
+@Path("/api/v1/clients")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ClientController {
 
-    @Inject
-    ClientRepository repository;
+	private static final Logger LOG = Logger.getLogger(ClientController.class);
 
-    // Endpoint: GET api/v1/clients
-    @GET
-    public List<Client> listAll() {
-        return repository.listAll();
-    }
+	@Inject
+	ClientService clientService;
 
-    // Endpoint: POST api/v1/clients
-    @POST
-    @Transactional
-    public Response create(Client client) {
-        Client exists = repository.find("dni", client.dni).firstResult();
+	@GET
+	public Response listAll() {
+		LOG.debug("GET /api/v1/clients - Listando todos los clientes");
 
-        if (exists != null) {
-            // error 409 (Conflict)
-            return Response.status(Response.Status.CONFLICT)
-                    .entity(java.util.Map.of("error", "Ya existe un cliente registrado con el DNI " + client.dni))
-                    .build();
-        }
+		try {
+			List<Client> clients = clientService.getAllClients();
+			LOG.infof("Clientes recuperados exitosamente - Total: %d", clients.size());
+			return Response.ok(clients).build();
+		} catch (Exception e) {
+			LOG.error("Error al listar clientes", e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ApiResponse(false, "Error interno del servidor"))
+					.build();
+		}
+	}
 
-        repository.persist(client);
-        return Response.status(Response.Status.CREATED).entity(client).build();
-    }
-    
-    // Endpoint: GET api/v1/clients/dni/{dni}
-    @GET
-    @Path("/dni/{dni}")
-    public Response findByDni(@PathParam("dni") Integer dni) {
-        Client found = repository.find("dni", dni).firstResult();
-        
-        if (found == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        
-        return Response.ok(found).build();
-    }
+	@POST
+	public Response create(Client client) {
+		LOG.infof("POST /api/v1/clients - DNI: %d, Nombre: %s",
+				client.dni, client.name);
 
-    // Endpoint: PUT api/v1/clients/{id}
-    @PUT
-    @Path("/{id}")
-    @Transactional
-    public Response update(@PathParam("id") Long id, Client datosNuevos) {
-        
-        Client entity = repository.findById(id);
+		try {
+			Client createdClient = clientService.createClient(client);
+			LOG.infof("Cliente creado exitosamente - ID: %d, DNI: %d",
+					createdClient.id, createdClient.dni);
 
-        // 404 Not Found
-        if (entity == null) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(java.util.Map.of("error", "Cliente no encontrado con id " + id))
-                    .build();
-        }
+			return Response.status(Response.Status.CREATED)
+					.entity(createdClient)
+					.build();
+		} catch (IllegalArgumentException e) {
+			LOG.warnf("Error al crear cliente: %s", e.getMessage());
+			return Response.status(Response.Status.CONFLICT)
+					.entity(new ApiResponse(false, e.getMessage()))
+					.build();
+		} catch (Exception e) {
+			LOG.errorf(e, "Error al crear cliente con DNI: %d", client.dni);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ApiResponse(false, "Error interno del servidor"))
+					.build();
+		}
+	}
 
-        entity.name = datosNuevos.name;
-        entity.address = datosNuevos.address;
-        entity.phone_number = datosNuevos.phone_number;
+	@GET
+	@Path("/dni/{dni}")
+	public Response findByDni(@PathParam("dni") Integer dni) {
+		LOG.debugf("GET /api/v1/clients/dni/%d", dni);
 
-        return Response.ok(entity).build();
-    }
+		try {
+			Optional<Client> clientOpt = clientService.getClientByDni(dni);
 
-    // Endpoint: DELETE api/v1/clients/{id}
-    @DELETE
-    @Path("/{id}")
-    @Transactional
-    public Response delete(@PathParam("id") Long id) {
+			if (clientOpt.isEmpty()) {
+				LOG.debugf("Cliente no encontrado con DNI: %d", dni);
+				return Response.status(Response.Status.NOT_FOUND)
+						.entity(new ApiResponse(false, "Cliente no encontrado"))
+						.build();
+			}
 
-        boolean eliminado = repository.deleteById(id);
+			Client client = clientOpt.get();
+			LOG.debugf("Cliente encontrado - ID: %d, DNI: %d", client.id, dni);
+			return Response.ok(client).build();
+		} catch (Exception e) {
+			LOG.errorf(e, "Error al buscar cliente por DNI: %d", dni);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ApiResponse(false, "Error interno del servidor"))
+					.build();
+		}
+	}
 
-        if (!eliminado) {
-            return Response.status(Response.Status.NOT_FOUND).build(); // 404
-        }
+	@PUT
+	@Path("/{id}")
+	public Response update(@PathParam("id") Long id, Client newData) {
+		LOG.infof("PUT /api/v1/clients/%d", id);
 
-        // On success: 204 No Content
-        return Response.noContent().build(); 
-    }
+		try {
+			Optional<Client> updatedClient = clientService.updateClient(id, newData);
+
+			if (updatedClient.isEmpty()) {
+				LOG.warnf("Intento de actualizar cliente inexistente - ID: %d", id);
+				return Response.status(Response.Status.NOT_FOUND)
+						.entity(new ApiResponse(false,
+								"Cliente no encontrado con id " + id))
+						.build();
+			}
+
+			Client client = updatedClient.get();
+			LOG.infof("Cliente actualizado exitosamente - ID: %d, DNI: %d",
+					client.id, client.dni);
+
+			return Response.ok(client).build();
+		} catch (Exception e) {
+			LOG.errorf(e, "Error al actualizar cliente con ID: %d", id);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ApiResponse(false, "Error interno del servidor"))
+					.build();
+		}
+	}
+
+	@DELETE
+	@Path("/{id}")
+	public Response delete(@PathParam("id") Long id) {
+		LOG.infof("DELETE /api/v1/clients/%d", id);
+
+		try {
+			boolean deleted = clientService.deleteClient(id);
+
+			if (!deleted) {
+				LOG.warnf("Intento de eliminar cliente inexistente - ID: %d", id);
+				return Response.status(Response.Status.NOT_FOUND)
+						.entity(new ApiResponse(false, "Cliente no encontrado"))
+						.build();
+			}
+
+			LOG.infof("Cliente eliminado exitosamente - ID: %d", id);
+			return Response.noContent().build();
+		} catch (Exception e) {
+			LOG.errorf(e, "Error al eliminar cliente con ID: %d", id);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ApiResponse(false, "Error interno del servidor"))
+					.build();
+		}
+	}
 }

@@ -9,7 +9,7 @@ import java.util.UUID;
 public class Session {
 
 	@Id
-	@Column(length = 36)
+	@Column(length = 36, nullable = false, updatable = false)
 	private String id;
 
 	@ManyToOne(fetch = FetchType.EAGER)
@@ -22,7 +22,7 @@ public class Session {
 	@Column(name = "expires_at", nullable = false)
 	private LocalDateTime expiresAt;
 
-	@Column(name = "last_activity")
+	@Column(name = "last_activity", nullable = false)
 	private LocalDateTime lastActivity;
 
 	@PrePersist

@@ -1,71 +1,115 @@
 package com.app.controller;
 
+import com.app.dto.ApiResponse;
 import com.app.model.Product;
-import com.app.repository.ProductRepository;
+import com.app.service.ProductService;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.List;
+import org.jboss.logging.Logger;
 
-@Path("api/v1/products")
+import java.util.List;
+import java.util.Optional;
+
+@Path("/api/v1/products")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProductController {
 
-    @Inject
-    ProductRepository repository;
+	private static final Logger LOG = Logger.getLogger(ProductController.class);
 
-    // Endpoint: GET api/v1/products
-    @GET
-    public List<Product> listAll() {
-        return repository.listAll();
-    }
+	@Inject
+	ProductService productService;
 
-    // Endpoint: POST api/v1/products
-    @POST
-    @Transactional
-    public Response create(Product product) {
-        repository.persist(product);
-        
-        // 201 (Created)
-        return Response.status(Response.Status.CREATED).entity(product).build();
-    }
+	@GET
+	public Response listAll() {
+		LOG.debug("GET /api/v1/products - Listando todos los productos");
 
-    // Endpoint: PUT api/v1/products/{id}
-    @PUT
-    @Path("/{id}")
-    @Transactional
-    public Response update(@PathParam("id") Long id, Product datosNuevos) {
+		try {
+			List<Product> products = productService.getAllProducts();
+			LOG.infof("Productos recuperados exitosamente - Total: %d", products.size());
+			return Response.ok(products).build();
+		} catch (Exception e) {
+			LOG.error("Error al listar productos", e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ApiResponse(false, "Error interno del servidor"))
+					.build();
+		}
+	}
 
-      Product entity = repository.findById(id);
+	@POST
+	public Response create(Product product) {
+		LOG.infof("POST /api/v1/products - Nombre: %s, Precio: %.2f",
+				product.name, product.price);
 
-      // error 404
-      if (entity == null) {
-          return Response.status(Response.Status.NOT_FOUND).build();
-      }
+		try {
+			Product createdProduct = productService.createProduct(product);
+			LOG.infof("Producto creado exitosamente - ID: %d, Nombre: %s",
+					createdProduct.id, createdProduct.name);
 
-      entity.name = datosNuevos.name;
-      entity.description = datosNuevos.description; 
-      entity.price = datosNuevos.price;
-      entity.stock = datosNuevos.stock;
-      
-      return Response.ok(entity).build();
-    }
+			return Response.status(Response.Status.CREATED)
+					.entity(createdProduct)
+					.build();
+		} catch (Exception e) {
+			LOG.errorf(e, "Error al crear producto: %s", product.name);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ApiResponse(false, "Error interno del servidor"))
+					.build();
+		}
+	}
 
-    // Endpoint: DELETE api/v1/products/{id}
-    @DELETE
-    @Path("/{id}")
-    @Transactional
-    public Response delete(@PathParam("id") Long id) {
-        
-        boolean eliminado = repository.deleteById(id);
+	@PUT
+	@Path("/{id}")
+	public Response update(@PathParam("id") Long id, Product newData) {
+		LOG.infof("PUT /api/v1/products/%d", id);
 
-        if (!eliminado) {
-            return Response.status(Response.Status.NOT_FOUND).build(); // 404
-        }
+		try {
+			Optional<Product> updatedProduct = productService.updateProduct(id, newData);
 
-        return Response.noContent().build(); // 204 
-    }
+			if (updatedProduct.isEmpty()) {
+				LOG.warnf("Intento de actualizar producto inexistente - ID: %d", id);
+				return Response.status(Response.Status.NOT_FOUND)
+						.entity(new ApiResponse(false,
+								"Producto no encontrado con id " + id))
+						.build();
+			}
+
+			Product product = updatedProduct.get();
+			LOG.infof("Producto actualizado exitosamente - ID: %d, Nombre: %s",
+					product.id, product.name);
+
+			return Response.ok(product).build();
+		} catch (Exception e) {
+			LOG.errorf(e, "Error al actualizar producto con ID: %d", id);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ApiResponse(false, "Error interno del servidor"))
+					.build();
+		}
+	}
+
+	@DELETE
+	@Path("/{id}")
+	public Response delete(@PathParam("id") Long id) {
+		LOG.infof("DELETE /api/v1/products/%d", id);
+
+		try {
+			boolean deleted = productService.deleteProduct(id);
+
+			if (!deleted) {
+				LOG.warnf("Intento de eliminar producto inexistente - ID: %d", id);
+				return Response.status(Response.Status.NOT_FOUND)
+						.entity(new ApiResponse(false, "Producto no encontrado"))
+						.build();
+			}
+
+			LOG.infof("Producto eliminado exitosamente - ID: %d", id);
+			return Response.noContent().build();
+		} catch (Exception e) {
+			LOG.errorf(e, "Error al eliminar producto con ID: %d", id);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ApiResponse(false, "Error interno del servidor"))
+					.build();
+		}
+	}
 }

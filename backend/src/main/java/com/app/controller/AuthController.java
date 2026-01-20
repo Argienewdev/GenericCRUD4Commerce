@@ -14,9 +14,9 @@ import java.util.Optional;
 @Path("/api/v1/auth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class AuthResource {
+public class AuthController {
 
-	private static final Logger LOG = Logger.getLogger(AuthResource.class);
+	private static final Logger LOG = Logger.getLogger(AuthController.class);
 
 	@Inject
 	AuthService authService;

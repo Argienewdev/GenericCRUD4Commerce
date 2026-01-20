@@ -1,6 +1,5 @@
 package com.app.service;
 
-import com.app.dto.CreateUserRequest;
 import com.app.dto.LoginRequest;
 import com.app.model.Session;
 import com.app.model.User;
@@ -90,7 +89,7 @@ public class AuthService {
 		Session session = sessionOpt.get();
 		User user = session.getUser();
 
-		if (!user.getActive()) {
+		if (!user.isActive()) {
 			LOG.warnf("Usuario inactivo intenta usar sesión válida. User ID: %d", user.getId());
 			return Optional.empty();
 		}
@@ -102,28 +101,6 @@ public class AuthService {
 				user.getUsername(), user.getId(), user.getRole());
 
 		return Optional.of(user);
-	}
-
-	@Transactional
-	public User createUser(CreateUserRequest createUserRequest) {
-		LOG.infof("Creando nuevo usuario: %s con rol: %s", createUserRequest.username(), createUserRequest.role());
-
-		if (userRepository.existsByUsername(createUserRequest.username())) {
-			LOG.errorf("Error: Usuario ya existe: %s", createUserRequest.username());
-			throw new IllegalArgumentException("El usuario ya existe");
-		}
-
-		User user = new User();
-		user.setUsername(createUserRequest.username());
-		user.setPasswordHash(passwordService.hashPassword(createUserRequest.password()));
-		user.setRole(createUserRequest.role());
-		user.setActive(true);
-
-		userRepository.persist(user);
-
-		LOG.infof("Usuario creado exitosamente: %s (ID: %d)", createUserRequest.username(), user.getId());
-
-		return user;
 	}
 
 	@Transactional

@@ -9,29 +9,30 @@ public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(updatable = false)
 	private Long id;
 
 	@Column(unique = true, nullable = false)
 	private String username;
 
-	@Column(nullable = false)
+	@Column(name = "password_hash", nullable = false)
 	private String passwordHash;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Role role;
 
-	@Column(nullable = false)
-	private Boolean active = true;
+	private boolean active = true;
 
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
-	@Column(name = "updated_at")
+	@Column(name = "updated_at", nullable = false)
 	private LocalDateTime updatedAt;
 
 	@PrePersist
 	protected void onCreate() {
+		active = true;
 		createdAt = LocalDateTime.now();
 		updatedAt = LocalDateTime.now();
 	}
@@ -73,7 +74,7 @@ public class User {
 		this.role = role;
 	}
 
-	public Boolean getActive() {
+	public Boolean isActive() {
 		return active;
 	}
 

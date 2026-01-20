@@ -1,0 +1,97 @@
+package com.app.service;
+
+import com.app.model.Product;
+import com.app.repository.ProductRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import org.jboss.logging.Logger;
+
+import java.util.List;
+import java.util.Optional;
+
+@ApplicationScoped
+public class ProductService {
+
+	private static final Logger LOG = Logger.getLogger(ProductService.class);
+
+	@Inject
+	ProductRepository productRepository;
+
+	public List<Product> getAllProducts() {
+		LOG.debug("Obteniendo lista de todos los productos");
+
+		List<Product> products = productRepository.listAll();
+
+		LOG.debugf("Total de productos encontrados: %d", products.size());
+
+		return products;
+	}
+
+	@Transactional
+	public Product createProduct(Product product) {
+		LOG.infof("Creando producto: %s, Precio: %.2f", product.name, product.price);
+
+		productRepository.persist(product);
+
+		LOG.infof("Producto creado exitosamente - ID: %d, Nombre: %s",
+				product.id, product.name);
+
+		return product;
+	}
+
+	public Optional<Product> getProductById(Long id) {
+		LOG.debugf("Buscando producto por ID: %d", id);
+
+		Optional<Product> productOpt = productRepository.findByIdOptional(id);
+
+		if (productOpt.isEmpty()) {
+			LOG.debugf("Producto no encontrado con ID: %d", id);
+		} else {
+			LOG.debugf("Producto encontrado: %s (ID: %d)",
+					productOpt.get().name, id);
+		}
+
+		return productOpt;
+	}
+
+	@Transactional
+	public Optional<Product> updateProduct(Long id, Product newData) {
+		LOG.infof("Actualizando producto con ID: %d", id);
+
+		Product entity = productRepository.findById(id);
+
+		if (entity == null) {
+			LOG.warnf("Intento de actualizar producto inexistente - ID: %d", id);
+			return Optional.empty();
+		}
+
+		entity.name = newData.name;
+		entity.description = newData.description;
+		entity.price = newData.price;
+		entity.stock = newData.stock;
+
+		productRepository.persist(entity);
+
+		LOG.infof("Producto actualizado exitosamente - ID: %d, Nombre: %s",
+				entity.id, entity.name);
+
+		return Optional.of(entity);
+	}
+
+	@Transactional
+	public boolean deleteProduct(Long id) {
+		LOG.infof("Eliminando producto con ID: %d", id);
+
+		boolean deleted = productRepository.deleteById(id);
+
+		if (!deleted) {
+			LOG.warnf("Intento de eliminar producto inexistente - ID: %d", id);
+			return false;
+		}
+
+		LOG.infof("Producto eliminado exitosamente - ID: %d", id);
+
+		return true;
+	}
+}
