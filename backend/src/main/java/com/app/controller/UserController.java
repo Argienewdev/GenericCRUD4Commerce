@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Path("/api/v1/users")
@@ -102,6 +103,42 @@ public class UserController {
 
 		} catch (Exception e) {
 			LOG.errorf(e, "Error al desactivar usuario con ID: %d", id);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ApiResponse(false, "Error interno del servidor"))
+					.build();
+		}
+	}
+
+	@PUT
+	@Path("/{id}")
+	@Secured(roles = { User.Role.ADMIN })
+	public Response updateUser(@PathParam("id") Long id, CreateUserRequest request) {
+		LOG.infof("PUT /api/v1/users/%d - Actualizando usuario: %s con rol: %s",
+				id, request.username(), request.role());
+
+		try {
+			Optional<User> updatedUser = userService.updateUser(id, request);
+
+			if (updatedUser.isEmpty()) {
+				return Response.status(Response.Status.NOT_FOUND)
+						.entity(new ApiResponse(false, "Usuario no encontrado"))
+						.build();
+			}
+
+			LOG.infof("Usuario actualizado exitosamente: %s (ID: %d)",
+					updatedUser.get().getUsername(), id);
+
+			return Response.ok(new ApiResponse(true, "Usuario actualizado exitosamente"))
+					.build();
+
+		} catch (IllegalArgumentException e) {
+			LOG.warnf("Error al actualizar usuario: %s", e.getMessage());
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(new ApiResponse(false, e.getMessage()))
+					.build();
+
+		} catch (Exception e) {
+			LOG.errorf(e, "Error inesperado al actualizar usuario: %s", request.username());
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(new ApiResponse(false, "Error interno del servidor"))
 					.build();

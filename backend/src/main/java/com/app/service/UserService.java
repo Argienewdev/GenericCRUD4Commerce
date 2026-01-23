@@ -38,34 +38,34 @@ public class UserService {
 		user.setRole(request.role());
 
 		userRepository.persist(user);
-		
+
 		LOG.infof("Usuario creado exitosamente: %s (ID: %d)", user.getUsername(), user.getId());
-		
+
 		return user;
 	}
 
 	public List<User> getAllUsers() {
 		LOG.debug("Obteniendo lista de todos los usuarios");
-		
+
 		List<User> users = userRepository.listAll();
-		
+
 		LOG.debugf("Total de usuarios encontrados: %d", users.size());
-		
+
 		return users;
 	}
 
 	public Optional<User> getUserById(Long id) {
 		LOG.debugf("Buscando usuario por ID: %d", id);
-		
+
 		Optional<User> userOpt = userRepository.findByIdOptional(id);
-		
+
 		if (userOpt.isEmpty()) {
 			LOG.debugf("Usuario no encontrado con ID: %d", id);
 		} else {
-			LOG.debugf("Usuario encontrado: %s (ID: %d)", 
+			LOG.debugf("Usuario encontrado: %s (ID: %d)",
 					userOpt.get().getUsername(), id);
 		}
-		
+
 		return userOpt;
 	}
 
@@ -81,9 +81,9 @@ public class UserService {
 		}
 
 		User user = userOpt.get();
-		
+
 		if (!user.isActive()) {
-			LOG.warnf("Usuario ya estaba desactivado: %s (ID: %d)", 
+			LOG.warnf("Usuario ya estaba desactivado: %s (ID: %d)",
 					user.getUsername(), id);
 			return false;
 		}
@@ -91,7 +91,7 @@ public class UserService {
 		user.setActive(false);
 		userRepository.persist(user);
 
-		LOG.infof("Usuario desactivado exitosamente: %s (ID: %d)", 
+		LOG.infof("Usuario desactivado exitosamente: %s (ID: %d)",
 				user.getUsername(), id);
 
 		return true;
@@ -109,9 +109,9 @@ public class UserService {
 		}
 
 		User user = userOpt.get();
-		
+
 		if (user.isActive()) {
-			LOG.warnf("Usuario ya estaba activo: %s (ID: %d)", 
+			LOG.warnf("Usuario ya estaba activo: %s (ID: %d)",
 					user.getUsername(), id);
 			return false;
 		}
@@ -119,7 +119,7 @@ public class UserService {
 		user.setActive(true);
 		userRepository.persist(user);
 
-		LOG.infof("Usuario activado exitosamente: %s (ID: %d)", 
+		LOG.infof("Usuario activado exitosamente: %s (ID: %d)",
 				user.getUsername(), id);
 
 		return true;
@@ -141,8 +141,45 @@ public class UserService {
 		user.setRole(newRole);
 		userRepository.persist(user);
 
-		LOG.infof("Rol de usuario actualizado exitosamente: %s (ID: %d) - %s -> %s", 
+		LOG.infof("Rol de usuario actualizado exitosamente: %s (ID: %d) - %s -> %s",
 				user.getUsername(), id, oldRole, newRole);
+
+		return Optional.of(user);
+	}
+
+	@Transactional
+	public Optional<User> updateUser(Long id, CreateUserRequest request) {
+		LOG.infof("Actualizando usuario ID: %d - Username: %s, Role: %s",
+				id, request.username(), request.role());
+
+		Optional<User> userOpt = userRepository.findByIdOptional(id);
+
+		if (userOpt.isEmpty()) {
+			LOG.warnf("Intento de actualizar usuario inexistente - ID: %d", id);
+			return Optional.empty();
+		}
+
+		User user = userOpt.get();
+
+		// Validar username si es diferente al actual
+		if (!user.getUsername().equals(request.username())) {
+			Optional<User> existingUser = userRepository.findByUsername(request.username());
+			if (existingUser.isPresent()) {
+				throw new IllegalArgumentException("Ya existe un usuario con el username: " + request.username());
+			}
+			user.setUsername(request.username());
+		}
+
+		// Actualizar password solo si no es nulo o vacío
+		if (request.password() != null && !request.password().trim().isEmpty()) {
+			user.setPasswordHash(BCrypt.hashpw(request.password(), BCrypt.gensalt()));
+		}
+
+		user.setRole(request.role());
+		userRepository.persist(user);
+
+		LOG.infof("Usuario actualizado exitosamente: %s (ID: %d)",
+				user.getUsername(), id);
 
 		return Optional.of(user);
 	}

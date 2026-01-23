@@ -21,6 +21,7 @@ import { clientsService } from "../services/clientsService";
 import { salesService } from "../services/salesService";
 import { usersService } from "../services/usersService";
 import type { ApiError } from "../services/apiClient";
+import type { Seller } from "../types/dashboard";
 
 export function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelType>("stock");
@@ -112,7 +113,7 @@ export function Dashboard() {
     }
   };
 
-  // Handles creation and 
+  // Handles creation and edition
   const handleSave = async (data: any) => {
     try {
       if (editingItem && currentView.updateAction) {
@@ -207,12 +208,12 @@ export function Dashboard() {
 
           {!loading && !error && (
             <ListComponent
-              items={data}
+              items={activePanel === "vendedores" ? (data as Seller[]).filter(u => u.active !== false) : data}
               sales={data}
               ventas={data}
               clientes={data}
-              sellers={data}
-              vendedores={data}
+              sellers={activePanel === "vendedores" ? (data as Seller[]).filter(u => u.active !== false) : data}
+              vendedores={activePanel === "vendedores" ? (data as Seller[]).filter(u => u.active !== false) : data}
               onDelete={handleDelete}
               onEdit={handleEdit} // Pasamos la función de editar
               onViewDetail={(id: number) => console.log(id)}
