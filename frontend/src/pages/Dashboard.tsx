@@ -2,6 +2,7 @@ import { useState } from "react";
 // Layout
 import { Sidebar } from "../components/layout/Sidebar";
 import { Header } from "../components/layout/Header";
+import { useAuth } from "../context/AuthContext";
 // Lists
 import { StockList } from "../components/stock/StockList";
 import { SalesList } from "../components/sales/SalesList";
@@ -12,6 +13,7 @@ import { StatsPanel } from "../components/stats/StatsPanel";
 import { ClientModal } from "../components/modals/ClientModal";
 import { ProductModal } from "../components/modals/ProductModal";
 import { DeleteConfirmationModal } from "../components/modals/DeleteConfirmationModal";
+import { UserModal } from "../components/modals/UserModal";
 // Hooks and config
 import { usePanel } from "../hooks/usePanel";
 import { PANEL_CONFIG, getMenuItems, type PanelType } from "../config/panelConfig";
@@ -26,6 +28,7 @@ import type { Seller } from "../types/dashboard";
 export function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelType>("stock");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { user } = useAuth();
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,9 +78,9 @@ export function Dashboard() {
       dataHook: sellersPanel,
       deleteAction: usersService.deleteUser,
       createAction: usersService.createUser,
-      updateAction: null,
+      updateAction: usersService.updateUser,
       RenderList: SellersList,
-      RenderModal: null
+      RenderModal: UserModal
     },
     estadisticas: {
       dataHook: { data: [], loading: false, error: null, refetch: () => { } },
@@ -170,7 +173,7 @@ export function Dashboard() {
       <Sidebar
         isOpen={sidebarOpen}
         activePanel={activePanel}
-        menuItems={getMenuItems()}
+        menuItems={getMenuItems(user?.role || 'VENDEDOR')}
         onPanelChange={setActivePanel}
       />
 
@@ -180,7 +183,7 @@ export function Dashboard() {
           sidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onNewAction={handleNewAction}
-          showNewButton={!!staticConfig.newButtonLabel}
+          showNewButton={!!staticConfig.newButtonLabel && (!staticConfig.requiredRole || staticConfig.requiredRole === user?.role)}
         />
 
         <div className="flex-1 overflow-y-auto p-6">
@@ -231,6 +234,7 @@ export function Dashboard() {
           // Pasamos props específicas según el panel activo
           client={activePanel === "clientes" ? editingItem : undefined}
           product={activePanel === "stock" ? editingItem : undefined}
+          user={activePanel === "vendedores" ? editingItem : undefined}
         />
       )}
 
