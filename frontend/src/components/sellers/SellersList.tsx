@@ -10,7 +10,7 @@ interface SellersListProps {
 export function SellersList({ sellers, onEdit, onDelete }: SellersListProps) {
   return (
     <div className="space-y-4">
-      {sellers.map((seller) => (
+      {sellers.filter(seller => seller.active !== false).map((seller) => (
         <SellerCard
           key={seller.id}
           seller={seller}

@@ -9,6 +9,7 @@ export interface UserInfo {
   id: number;
   username: string;
   role: Role;
+  active: boolean;
 }
 
 export interface LoginRequest {

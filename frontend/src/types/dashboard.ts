@@ -48,4 +48,5 @@ export interface Seller {
 	//email: string;
 	role: string;
 	//sales: number;
+	active: boolean;
 }
