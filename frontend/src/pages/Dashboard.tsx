@@ -2,7 +2,6 @@ import { useState } from "react";
 // Layout
 import { Sidebar } from "../components/layout/Sidebar";
 import { Header } from "../components/layout/Header";
-import { useAuth } from "../context/AuthContext";
 // Lists
 import { StockList } from "../components/stock/StockList";
 import { SalesList } from "../components/sales/SalesList";
@@ -28,7 +27,6 @@ import type { Seller } from "../types/dashboard";
 export function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelType>("stock");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { user } = useAuth();
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -173,7 +171,7 @@ export function Dashboard() {
       <Sidebar
         isOpen={sidebarOpen}
         activePanel={activePanel}
-        menuItems={getMenuItems(user?.role || 'VENDEDOR')}
+        menuItems={getMenuItems()}
         onPanelChange={setActivePanel}
       />
 
@@ -183,7 +181,7 @@ export function Dashboard() {
           sidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onNewAction={handleNewAction}
-          showNewButton={!!staticConfig.newButtonLabel && (!staticConfig.requiredRole || staticConfig.requiredRole === user?.role)}
+          showNewButton={!!staticConfig.newButtonLabel}
         />
 
         <div className="flex-1 overflow-y-auto p-6">
