@@ -44,8 +44,8 @@ export interface StatCard {
 
 export interface Seller {
 	id: number;
-	name: string;
-	email: string;
+	username: string;
+	//email: string;
 	role: string;
-	sales: number;
+	//sales: number;
 }

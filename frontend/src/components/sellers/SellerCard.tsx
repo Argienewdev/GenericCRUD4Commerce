@@ -17,13 +17,13 @@ export function SellerCard({
 			<div className="flex items-start justify-between">
 				<div className="flex items-center gap-4">
 					<div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-						{seller.name.charAt(0)}
+						{seller.username.charAt(0)}
 					</div>
 					<div className="flex-1">
 						<h3 className="text-lg font-semibold text-slate-800">
-							{seller.name}
+							{seller.username}
 						</h3>
-						<p className="text-slate-600 text-sm">{seller.email}</p>
+						{/*<p className="text-slate-600 text-sm">{seller.email}</p>*/}
 						<div className="flex gap-4 mt-2">
 							<span
 								className={`px-3 py-1 rounded-full text-xs font-medium ${seller.role === "Admin"
@@ -33,9 +33,11 @@ export function SellerCard({
 							>
 								{seller.role}
 							</span>
+							{/*
 							<span className="text-sm text-slate-500">
 								{seller.sales} ventas realizadas
 							</span>
+							*/}
 						</div>
 					</div>
 				</div>
