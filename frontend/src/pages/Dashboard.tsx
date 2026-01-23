@@ -26,15 +26,15 @@ export function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelType>("stock");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Modal Estados
+  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null); // Estado para el ítem en edición
 
-  // Delete Modal Estados
+  // Delete Modal States
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  // Hooks de datos
+  // Data hooks
   const stockPanel = usePanel("stock", { enabled: activePanel === "stock" });
   const salesPanel = usePanel("ventas", { enabled: activePanel === "ventas" });
   const clientsPanel = usePanel("clientes", { enabled: activePanel === "clientes" });
@@ -43,14 +43,14 @@ export function Dashboard() {
   const staticConfig = PANEL_CONFIG[activePanel];
 
   // ========================================================================
-  // CONFIGURACIÓN VISUAL (Mapeo de Componentes)
+  // Components's mapping
   // ========================================================================
   const viewConfig = {
     stock: {
       dataHook: stockPanel,
       deleteAction: stockService.deleteProduct,
       createAction: stockService.createProduct,
-      updateAction: stockService.updateProduct, // <-- Acción de actualización
+      updateAction: stockService.updateProduct,
       RenderList: StockList,
       RenderModal: ProductModal
     },
@@ -58,7 +58,7 @@ export function Dashboard() {
       dataHook: clientsPanel,
       deleteAction: clientsService.deleteClient,
       createAction: clientsService.createClient,
-      updateAction: clientsService.updateClient, // <-- Acción de actualización
+      updateAction: clientsService.updateClient,
       RenderList: ClientsList,
       RenderModal: ClientModal
     },
@@ -106,14 +106,13 @@ export function Dashboard() {
     try {
       await currentView.deleteAction(deletingId);
       currentView.dataHook.refetch();
-      // El modal se cierra automáticamente al resolver la promesa en onConfirm
     } catch (e) {
       console.error(e);
       alert("Error al eliminar el registro.");
     }
   };
 
-  // Maneja tanto creación como edición
+  // Handles creation and 
   const handleSave = async (data: any) => {
     try {
       if (editingItem && currentView.updateAction) {
