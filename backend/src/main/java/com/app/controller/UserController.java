@@ -34,7 +34,7 @@ public class UserController {
 		try {
 			User user = userService.createUser(request);
 
-			LOG.infof("Usuario creado exitosamente: %s (ID: %d)", 
+			LOG.infof("Usuario creado exitosamente: %s (ID: %d)",
 					user.getUsername(), user.getId());
 
 			return Response.status(Response.Status.CREATED)
@@ -62,12 +62,12 @@ public class UserController {
 
 		try {
 			List<User> users = userService.getAllUsers();
-			
+
 			List<UserInfo> userInfoList = users.stream()
 					.map(UserInfo::fromUser)
 					.collect(Collectors.toList());
 
-			LOG.debugf("Usuarios recuperados exitosamente - Total: %d", userInfoList.size());
+			LOG.infof("Usuarios recuperados exitosamente - Total: %d", userInfoList.size());
 
 			return Response.ok(userInfoList).build();
 
