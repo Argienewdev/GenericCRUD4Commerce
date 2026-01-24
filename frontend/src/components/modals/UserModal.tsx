@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Role, type UserInfo, type CreateUserRequest } from "../../types/auth";
+import { useAuth } from "../../context/AuthContext";
 
 interface UserModalProps {
   isOpen: boolean;
@@ -11,6 +12,8 @@ interface UserModalProps {
 
 export function UserModal({ isOpen, onClose, onSave, user }: UserModalProps) {
   const [loading, setLoading] = useState(false);
+	const a = useAuth();
+	console.log(a.user);
   const [formData, setFormData] = useState({
     username: "",
     password: "",

@@ -6,11 +6,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
-public class SessionRepository implements PanacheRepositoryBase<Session, String> {
+public class SessionRepository implements PanacheRepositoryBase<Session, UUID> {
 
-    public Optional<Session> findValidSession(String sessionId) {
+    public Optional<Session> findValidSession(UUID sessionId) {
         return find("id = ?1 and expiresAt > ?2", sessionId, LocalDateTime.now())
             .firstResultOptional();
     }
