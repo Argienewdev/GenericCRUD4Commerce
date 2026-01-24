@@ -56,12 +56,16 @@ public class AuthService {
 	}
 
 	@Transactional
-	public boolean logout(String sessionIdString) {
-		LOG.infof("Intento de logout. Session ID: %s", sessionIdString);
+	public boolean logout(String sessionId) {
+		LOG.infof("Intento de logout. Session ID: %s", sessionId);
+
+		if (sessionId == null || sessionId.isBlank()) {
+			return false;
+		}
 
 		try {
-			UUID sessionId = UUID.fromString(sessionIdString);
-			Optional<Session> sessionOpt = sessionRepository.findByIdOptional(sessionId);
+			UUID id = UUID.fromString(sessionId);
+			Optional<Session> sessionOpt = sessionRepository.findByIdOptional(id);
 
 			if (sessionOpt.isEmpty()) {
 				LOG.warnf("Sesión no encontrada para logout: %s", sessionId);
@@ -70,52 +74,44 @@ public class AuthService {
 
 			sessionRepository.delete(sessionOpt.get());
 			LOG.infof("Logout exitoso. Session ID: %s", sessionId);
-
 			return true;
-
 		} catch (IllegalArgumentException e) {
-			LOG.warnf("Session ID inválido en logout: %s", sessionIdString);
+			LOG.warnf("Session ID inválido para logout: %s", sessionId);
 			return false;
 		}
 	}
 
-	public Optional<User> validateSession(String sessionIdString) {
-		if (sessionIdString == null || sessionIdString.isBlank()) {
+	@Transactional
+	public Optional<User> validateSession(String sessionId) {
+		if (sessionId == null || sessionId.isBlank()) {
 			LOG.debug("Session ID vacío en validateSession");
 			return Optional.empty();
 		}
 
-		try {
-			UUID sessionId = UUID.fromString(sessionIdString);
-			LOG.debugf("Validando sesión: %s", sessionId);
+		LOG.debugf("Validando sesión: %s", sessionId);
 
-			Optional<Session> sessionOpt = sessionRepository.findValidSession(sessionId);
+		Optional<Session> sessionOpt = sessionRepository.findValidSession(sessionId);
 
-			if (sessionOpt.isEmpty()) {
-				LOG.debugf("Sesión inválida o expirada: %s", sessionId);
-				return Optional.empty();
-			}
-
-			Session session = sessionOpt.get();
-			User user = session.getUser();
-
-			if (!user.isActive()) {
-				LOG.warnf("Usuario inactivo intenta usar sesión válida. User ID: %d", user.getId());
-				return Optional.empty();
-			}
-
-			session.updateActivity();
-			sessionRepository.persist(session);
-
-			LOG.debugf("Sesión válida para usuario: %s (ID: %d, Role: %s)",
-					user.getUsername(), user.getId(), user.getRole());
-
-			return Optional.of(user);
-
-		} catch (IllegalArgumentException e) {
-			LOG.warnf("Session ID inválido en validateSession: %s", sessionIdString);
+		if (sessionOpt.isEmpty()) {
+			LOG.debugf("Sesión inválida o expirada: %s", sessionId);
 			return Optional.empty();
 		}
+
+		Session session = sessionOpt.get();
+		User user = session.getUser();
+
+		if (!user.isActive()) {
+			LOG.warnf("Usuario inactivo intenta usar sesión válida. User ID: %d", user.getId());
+			return Optional.empty();
+		}
+
+		session.updateActivity();
+		sessionRepository.persist(session);
+
+		LOG.debugf("Sesión válida para usuario: %s (ID: %d, Role: %s)",
+				user.getUsername(), user.getId(), user.getRole());
+
+		return Optional.of(user);
 	}
 
 	@Transactional

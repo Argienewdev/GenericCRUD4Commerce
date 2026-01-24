@@ -7,7 +7,6 @@ export const usersService = {
   },
 
   createUser: async (data: CreateUserRequest): Promise<UserInfo> => {
-		console.log("ENVIANDO: " + data);
     return apiClient.post<UserInfo>('/users', data);
   },
 
