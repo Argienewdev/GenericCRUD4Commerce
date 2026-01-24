@@ -28,6 +28,6 @@ public class Client {
   @Column(unique = true, nullable = false)
   public String dni;
 
-  @Column(name = "phoneNumber", nullable = false)
+  @Column(name = "phone_number", nullable =  false)
   public String phoneNumber;
 }
