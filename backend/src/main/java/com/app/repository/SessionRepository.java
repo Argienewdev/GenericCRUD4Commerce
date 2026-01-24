@@ -11,16 +11,16 @@ import java.util.UUID;
 @ApplicationScoped
 public class SessionRepository implements PanacheRepositoryBase<Session, UUID> {
 
-    public Optional<Session> findValidSession(UUID sessionId) {
-        return find("id = ?1 and expiresAt > ?2", sessionId, LocalDateTime.now())
-            .firstResultOptional();
-    }
+	public Optional<Session> findValidSession(UUID sessionId) {
+		return find("id = ?1 and expiresAt > ?2", sessionId, LocalDateTime.now())
+				.firstResultOptional();
+	}
 
-    public void deleteExpiredSessions() {
-        delete("expiresAt < ?1", LocalDateTime.now());
-    }
+	public void deleteExpiredSessions() {
+		delete("expiresAt < ?1", LocalDateTime.now());
+	}
 
-    public void deleteByUserId(Long userId) {
-        delete("user.id = ?1", userId);
-    }
+	public void deleteByUserId(Long userId) {
+		delete("user.id = ?1", userId);
+	}
 }
