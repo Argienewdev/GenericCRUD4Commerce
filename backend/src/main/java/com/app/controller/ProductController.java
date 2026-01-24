@@ -2,6 +2,7 @@ package com.app.controller;
 
 import com.app.dto.ApiResponse;
 import com.app.model.Product;
+import com.app.security.Secured;
 import com.app.service.ProductService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -15,6 +16,22 @@ import java.util.Optional;
 @Path("/api/v1/products")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+
+/*
+ * All methods in this class require authentication (@Secured at class level).
+ * 
+ * This ensures:
+ * 
+ * - Every request has a valid session
+ * - SecurityContext.getCurrentUser() is always available and never null
+ * - Session validation happens once per request in the filter (no manual checks
+ * needed)
+ * 
+ * Individual methods can override with @Secured(roles = {...}) to add
+ * role-based authorization.
+ */
+
+@Secured
 public class ProductController {
 
 	private static final Logger LOG = Logger.getLogger(ProductController.class);

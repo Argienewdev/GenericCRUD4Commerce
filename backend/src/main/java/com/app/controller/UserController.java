@@ -19,6 +19,22 @@ import java.util.stream.Collectors;
 @Path("/api/v1/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+
+/*
+ * All methods in this class require authentication (@Secured at class level).
+ * 
+ * This ensures:
+ * 
+ * - Every request has a valid session
+ * - SecurityContext.getCurrentUser() is always available and never null
+ * - Session validation happens once per request in the filter (no manual checks
+ * needed)
+ * 
+ * Individual methods can override with @Secured(roles = {...}) to add
+ * role-based authorization.
+ */
+
+@Secured(roles = { User.Role.ADMIN })
 public class UserController {
 
 	private static final Logger LOG = Logger.getLogger(UserController.class);
@@ -27,7 +43,6 @@ public class UserController {
 	UserService userService;
 
 	@POST
-	@Secured(roles = { User.Role.ADMIN })
 	public Response createUser(CreateUserRequest request) {
 		LOG.infof("POST /api/v1/users - Creando usuario: %s con rol: %s",
 				request.username(), request.role());
@@ -57,7 +72,6 @@ public class UserController {
 	}
 
 	@GET
-	@Secured(roles = { User.Role.ADMIN })
 	public Response listUsers() {
 		LOG.debug("GET /api/v1/users - Listando usuarios");
 
@@ -82,7 +96,6 @@ public class UserController {
 
 	@DELETE
 	@Path("/{id}")
-	@Secured(roles = { User.Role.ADMIN })
 	public Response deleteUser(@PathParam("id") Long id) {
 		LOG.infof("DELETE /api/v1/users/%d - Desactivando usuario", id);
 
@@ -111,7 +124,6 @@ public class UserController {
 
 	@PUT
 	@Path("/{id}")
-	@Secured(roles = { User.Role.ADMIN })
 	public Response updateUser(@PathParam("id") Long id, CreateUserRequest request) {
 		LOG.infof("PUT /api/v1/users/%d - Actualizando usuario: %s con rol: %s",
 				id, request.username(), request.role());

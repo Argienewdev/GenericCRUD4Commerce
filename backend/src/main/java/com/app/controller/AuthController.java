@@ -3,6 +3,8 @@ package com.app.controller;
 import com.app.dto.*;
 import com.app.model.Session;
 import com.app.model.User;
+import com.app.security.Secured;
+import com.app.security.SecurityContext;
 import com.app.service.AuthService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -20,6 +22,9 @@ public class AuthController {
 
 	@Inject
 	AuthService authService;
+
+	@Inject
+	SecurityContext securityContext;
 
 	private static final String SESSION_COOKIE_NAME = "SESSION_ID";
 	private static final int COOKIE_MAX_AGE = -1;
@@ -70,6 +75,7 @@ public class AuthController {
 		}
 	}
 
+	@Secured
 	@POST
 	@Path("/logout")
 	public Response logout(@CookieParam(SESSION_COOKIE_NAME) String sessionId) {
@@ -101,21 +107,14 @@ public class AuthController {
 				.build();
 	}
 
+	@Secured
 	@GET
 	@Path("/me")
 	public Response me(@CookieParam(SESSION_COOKIE_NAME) String sessionId) {
 		LOG.debugf("GET /api/v1/auth/me - Session ID: %s", sessionId);
 
-		Optional<User> userOpt = authService.validateSession(sessionId);
-
-		if (userOpt.isEmpty()) {
-			LOG.debugf("Sesión inválida en /me: %s", sessionId);
-			return Response.status(Response.Status.UNAUTHORIZED)
-					.entity(new ApiResponse(false, "Sesión inválida"))
-					.build();
-		}
-
-		User user = userOpt.get();
+		User user = securityContext.getCurrentUser();
+		
 		LOG.debugf("/me exitoso - Usuario: %s (ID: %d)", user.getUsername(), user.getId());
 
 		return Response.ok(new MeResponse(UserInfo.fromUser(user)))
