@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 public class AuthService {
@@ -58,19 +59,29 @@ public class AuthService {
 	public boolean logout(String sessionId) {
 		LOG.infof("Intento de logout. Session ID: %s", sessionId);
 
-		Optional<Session> sessionOpt = sessionRepository.findByIdOptional(sessionId);
-
-		if (sessionOpt.isEmpty()) {
-			LOG.warnf("Sesión no encontrada para logout: %s", sessionId);
+		if (sessionId == null || sessionId.isBlank()) {
 			return false;
 		}
 
-		sessionRepository.delete(sessionOpt.get());
-		LOG.infof("Logout exitoso. Session ID: %s", sessionId);
+		try {
+			UUID id = UUID.fromString(sessionId);
+			Optional<Session> sessionOpt = sessionRepository.findByIdOptional(id);
 
-		return true;
+			if (sessionOpt.isEmpty()) {
+				LOG.warnf("Sesión no encontrada para logout: %s", sessionId);
+				return false;
+			}
+
+			sessionRepository.delete(sessionOpt.get());
+			LOG.infof("Logout exitoso. Session ID: %s", sessionId);
+			return true;
+		} catch (IllegalArgumentException e) {
+			LOG.warnf("Session ID inválido para logout: %s", sessionId);
+			return false;
+		}
 	}
 
+	@Transactional
 	public Optional<User> validateSession(String sessionId) {
 		if (sessionId == null || sessionId.isBlank()) {
 			LOG.debug("Session ID vacío en validateSession");
