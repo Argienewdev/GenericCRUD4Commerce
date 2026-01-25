@@ -19,7 +19,6 @@ export interface Sale {
   id: number;
   total: number;
   date: string;
-  client: Client;
   seller: Seller;
 }
 
@@ -56,6 +55,5 @@ export interface SaleItemEntry {
 }
 
 export interface SaleDTO {
-  clientId: number;
   items: SaleItemEntry[];
 }

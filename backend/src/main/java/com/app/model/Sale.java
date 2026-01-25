@@ -20,10 +20,6 @@ public class Sale {
   public Long id;
 
   @ManyToOne
-  @JoinColumn(name = "client_id", nullable = false)
-  public Client client;
-
-  @ManyToOne
   @JoinColumn(name = "seller_id", nullable = false)
   public User seller;
 

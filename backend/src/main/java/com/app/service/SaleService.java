@@ -1,7 +1,6 @@
 package com.app.service;
 
 import com.app.dto.SaleDTO;
-import com.app.model.Client;
 import com.app.model.Product;
 import com.app.model.Sale;
 import com.app.model.SaleItem;
@@ -51,14 +50,7 @@ public class SaleService {
 
   @Transactional
   public Sale createSale(SaleDTO saleDTO, User seller) {
-    LOG.infof("Iniciando creación de venta para cliente ID: %d", saleDTO.clientId);
-
-    // 1. Validar cliente
-    Client client = clientRepository.findById(saleDTO.clientId);
-    if (client == null) {
-      LOG.errorf("Cliente no encontrado con ID: %d", saleDTO.clientId);
-      throw new IllegalArgumentException("Cliente no encontrado");
-    }
+    LOG.info("Iniciando creación de venta");
 
     // 2. Validar stock de todos los productos primero (Atomicidad)
     List<SaleItemTemp> itemsToProcess = new ArrayList<>();
@@ -83,7 +75,6 @@ public class SaleService {
 
     // 3. Crear cabecera de venta
     Sale sale = new Sale();
-    sale.client = client;
     sale.seller = seller;
     sale.date = LocalDateTime.now();
     sale.total = total;

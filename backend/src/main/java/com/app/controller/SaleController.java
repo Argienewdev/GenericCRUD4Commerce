@@ -36,8 +36,7 @@ public class SaleController {
   @POST
   public Response create(SaleDTO saleDTO) {
     User currentUser = securityContext.getCurrentUser();
-    LOG.infof("POST /api/v1/sales - Cliente ID: %d, Seller: %s",
-        saleDTO.clientId, currentUser.getUsername());
+    LOG.infof("POST /api/v1/sales - Seller: %s", currentUser.getUsername());
 
     try {
       Sale createdSale = saleService.createSale(saleDTO, currentUser);

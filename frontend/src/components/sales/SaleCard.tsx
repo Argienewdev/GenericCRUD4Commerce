@@ -22,9 +22,6 @@ export function SaleCard({ sale, onViewDetail, onDelete }: SaleCardProps) {
           </div>
           <div className="flex gap-6 mt-3 text-sm text-slate-600">
             <span>
-              Cliente: <span className="font-medium text-slate-800">{sale.client.name} {sale.client.surname}</span>
-            </span>
-            <span>
               Vendedor: <span className="font-medium text-slate-800">{sale.seller.username}</span>
             </span>
           </div>
