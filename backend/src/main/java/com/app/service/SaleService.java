@@ -45,6 +45,7 @@ public class SaleService {
     LOG.infof("Eliminando venta con ID: %d", id);
     // Nota: Ahora configurado con cascade en la entidad Sale,
     // borrando la venta se borran automáticamente sus items.
+    // NO SE RESTAURA EL STOCK
     return saleRepository.deleteById(id);
   }
 
