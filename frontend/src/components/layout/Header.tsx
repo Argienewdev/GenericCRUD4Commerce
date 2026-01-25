@@ -1,4 +1,4 @@
-import { Menu, X, Search, Plus } from 'lucide-react';
+import { Menu, X, Search, Plus, ShoppingCart } from 'lucide-react';
 import type { PanelType } from '../../config/panelConfig';
 import { PANEL_CONFIG } from '../../config/panelConfig';
 
@@ -7,6 +7,7 @@ interface HeaderProps {
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
   onNewAction?: () => void;
+  onSaleAction?: () => void;
   showNewButton?: boolean;
 }
 
@@ -15,6 +16,7 @@ export function Header({
   sidebarOpen,
   onToggleSidebar,
   onNewAction,
+  onSaleAction,
   showNewButton = true
 }: HeaderProps) {
   const config = PANEL_CONFIG[activePanel];
@@ -48,13 +50,24 @@ export function Header({
         </div>
 
         {config.newButtonLabel && showNewButton && (
-          <button
-            onClick={onNewAction}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all shadow-md active:scale-95"
-          >
-            <Plus size={20} />
-            <span className="hidden sm:inline">{config.newButtonLabel}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {activePanel === "stock" && onSaleAction && (
+              <button
+                onClick={onSaleAction}
+                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md active:scale-95"
+              >
+                <ShoppingCart size={20} />
+                <span className="hidden sm:inline">Realizar Venta</span>
+              </button>
+            )}
+            <button
+              onClick={onNewAction}
+              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all shadow-md active:scale-95"
+            >
+              <Plus size={20} />
+              <span className="hidden sm:inline">{config.newButtonLabel}</span>
+            </button>
+          </div>
         )}
       </div>
     </div>
