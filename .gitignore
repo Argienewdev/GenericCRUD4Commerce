@@ -93,3 +93,4 @@ docker-compose.override.yml
 # GITHUB / CI AUTOMATION LOGS
 # ===============================
 backend/.github/java-upgrade/**/logs/
+.agent/rules/coding-language.md
