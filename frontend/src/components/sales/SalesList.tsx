@@ -4,9 +4,10 @@ import { SaleCard } from './SaleCard.tsx'
 interface SalesListProps {
   sales: Sale[];
   onViewDetail?: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
-export function SalesList({ sales, onViewDetail }: SalesListProps) {
+export function SalesList({ sales, onViewDetail, onDelete }: SalesListProps) {
   return (
     <div className="space-y-4">
       {/* Date Filters */}
@@ -23,13 +24,20 @@ export function SalesList({ sales, onViewDetail }: SalesListProps) {
       </div>
 
       {/* Ventas */}
-      {sales.map((sale) => (
-        <SaleCard
-          key={sale.id}
-          sale={sale}
-          onViewDetail={onViewDetail}
-        />
-      ))}
+      {Array.isArray(sales) ? (
+        sales.map((sale) => (
+          <SaleCard
+            key={sale.id}
+            sale={sale}
+            onViewDetail={onViewDetail}
+            onDelete={onDelete}
+          />
+        ))
+      ) : (
+        <div className="text-center py-10 text-slate-500 italic">
+          No hay ventas para mostrar
+        </div>
+      )}
     </div>
   );
 }

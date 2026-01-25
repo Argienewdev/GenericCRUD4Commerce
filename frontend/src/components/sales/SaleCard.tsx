@@ -1,11 +1,13 @@
-import { type Sale } from '../../types/dashboard.ts';
+import { type Sale } from '../../types/dashboard';
+import { Trash2 } from 'lucide-react';
 
 interface SaleCardProps {
   sale: Sale;
   onViewDetail?: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
-export function SaleCard({ sale, onViewDetail }: SaleCardProps) {
+export function SaleCard({ sale, onViewDetail, onDelete }: SaleCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all">
       <div className="flex items-center justify-between">
@@ -34,6 +36,13 @@ export function SaleCard({ sale, onViewDetail }: SaleCardProps) {
             className="text-blue-600 hover:text-blue-700 font-medium text-sm"
           >
             Ver detalle →
+          </button>
+          <button
+            onClick={() => onDelete?.(sale.id)}
+            className="text-red-400 hover:text-red-600 transition-colors p-1"
+            title="Eliminar venta"
+          >
+            <Trash2 size={16} />
           </button>
         </div>
       </div>
