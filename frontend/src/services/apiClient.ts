@@ -38,7 +38,7 @@ const createAxiosInstance = (): AxiosInstance => {
 	// Response interceptor
 	instance.interceptors.response.use(
 		(response: AxiosResponse) => {
-			console.log(`[API] ${response.status} ${response.config.url}`);
+			console.log(`[API] ${response.status} ${response.config.url}`, response.data);
 			return response;
 		},
 		(error: AxiosError<ApiResponse>) => {
