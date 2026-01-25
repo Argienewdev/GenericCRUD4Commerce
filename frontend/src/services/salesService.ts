@@ -1,4 +1,4 @@
-import type { Sale } from "../types/dashboard";
+import type { Sale, SaleDTO } from "../types/dashboard";
 import { apiClient } from "./apiClient"
 
 export const salesService = {
@@ -7,7 +7,7 @@ export const salesService = {
     return apiClient.get<Sale[]>('/sales');
   },
 
-  createSale: async (data: any): Promise<Sale> => {
+  createSale: async (data: SaleDTO): Promise<Sale> => {
     return apiClient.post<Sale>('/sales', data);
   },
   

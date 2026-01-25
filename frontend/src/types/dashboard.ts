@@ -16,12 +16,11 @@ export interface MenuItem {
 }
 
 export interface Sale {
-	id: number;
-	total: number;
-	date: string;
-	client: string;
-	products: number;
-	seller: string;
+  id: number;
+  total: number;
+  date: string;
+  client: Client;
+  seller: Seller;
 }
 
 export interface Client {
@@ -49,4 +48,14 @@ export interface Seller {
 	role: string;
 	//sales: number;
 	active: boolean;
+}
+
+export interface SaleItemEntry {
+  productId: number;
+  quantity: number;
+}
+
+export interface SaleDTO {
+  clientId: number;
+  items: SaleItemEntry[];
 }
