@@ -13,6 +13,7 @@ import { ClientModal } from "../components/modals/ClientModal";
 import { ProductModal } from "../components/modals/ProductModal";
 import { DeleteConfirmationModal } from "../components/modals/DeleteConfirmationModal";
 import { UserModal } from "../components/modals/UserModal";
+import { SaleModal } from "../components/modals/SaleModal";
 // Hooks and config
 import { usePanel } from "../hooks/usePanel";
 import { PANEL_CONFIG, getMenuItems, type PanelType } from "../config/panelConfig";
@@ -22,7 +23,7 @@ import { clientsService } from "../services/clientsService";
 import { salesService } from "../services/salesService";
 import { usersService } from "../services/usersService";
 import type { ApiError } from "../services/apiClient";
-import type { Seller } from "../types/dashboard";
+import type { Seller, StockItem, Sale, Client } from "../types/dashboard";
 
 export function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelType>("stock");
@@ -30,17 +31,18 @@ export function Dashboard() {
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null); // Estado para el ítem en edición
+  const [editingItem, setEditingItem] = useState<StockItem | Client | Seller | null>(null); // Estado para el ítem en edición
 
   // Delete Modal States
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isSaleModalOpen, setIsSaleModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   // Data hooks
-  const stockPanel = usePanel("stock", { enabled: activePanel === "stock" });
-  const salesPanel = usePanel("ventas", { enabled: activePanel === "ventas" });
-  const clientsPanel = usePanel("clientes", { enabled: activePanel === "clientes" });
-  const sellersPanel = usePanel("vendedores", { enabled: activePanel === "vendedores" });
+  const stockPanel = usePanel<StockItem>("stock", { enabled: activePanel === "stock" });
+  const salesPanel = usePanel<Sale>("ventas", { enabled: activePanel === "ventas" });
+  const clientsPanel = usePanel<Client>("clientes", {enabled: activePanel === "clientes" });
+  const sellersPanel = usePanel<Seller>("vendedores", { enabled: activePanel === "vendedores" });
 
   const staticConfig = PANEL_CONFIG[activePanel];
 
@@ -70,7 +72,7 @@ export function Dashboard() {
       createAction: salesService.createSale,
       updateAction: null,
       RenderList: SalesList,
-      RenderModal: null
+      RenderModal: SaleModal
     },
     vendedores: {
       dataHook: sellersPanel,
@@ -140,6 +142,19 @@ export function Dashboard() {
     }
   };
 
+  const handleSaleSave = async (saleDTO: any) => {
+    try {
+      await salesService.createSale(saleDTO);
+      salesPanel.refetch();
+      stockPanel.refetch(); // Refrescar stock tras la venta
+      handleCloseModal();
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || "Error al realizar la venta");
+    }
+  };
+
+
   const handleEdit = (item: any) => {
     setEditingItem(item);
     setIsModalOpen(true);
@@ -156,7 +171,12 @@ export function Dashboard() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setIsSaleModalOpen(false);
     setEditingItem(null);
+  };
+
+  const handleSaleAction = () => {
+    setIsSaleModalOpen(true);
   };
 
   // ============================================
@@ -164,7 +184,7 @@ export function Dashboard() {
   // ============================================
   const { data, loading, error, refetch } = currentView.dataHook;
   const ListComponent = currentView.RenderList as any;
-  const ModalComponent = currentView.RenderModal;
+  const ModalComponent = currentView.RenderModal as any;
 
   return (
     <div className="flex h-screen bg-slate-50">
@@ -181,6 +201,7 @@ export function Dashboard() {
           sidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onNewAction={handleNewAction}
+          onSaleAction={handleSaleAction}
           showNewButton={!!staticConfig.newButtonLabel}
         />
 
@@ -224,17 +245,25 @@ export function Dashboard() {
       </div>
 
       {/* Modal de Edición / Creación */}
-      {ModalComponent && (
+      {ModalComponent && activePanel !== "ventas" && (
         <ModalComponent
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           onSave={handleSave}
           // Pasamos props específicas según el panel activo
-          client={activePanel === "clientes" ? editingItem : undefined}
-          product={activePanel === "stock" ? editingItem : undefined}
-          user={activePanel === "vendedores" ? editingItem : undefined}
+          client={activePanel === "clientes" ? editingItem as any : undefined}
+          product={activePanel === "stock" ? editingItem as any : undefined}
+          user={activePanel === "vendedores" ? editingItem as any : undefined}
         />
       )}
+
+      {/* Sale Modal (Standalone logic because it needs more props) */}
+      <SaleModal
+        isOpen={isSaleModalOpen || (activePanel === "ventas" && isModalOpen)}
+        onClose={handleCloseModal}
+        onSave={handleSaleSave}
+        products={stockPanel.data as StockItem[]}
+      />
 
       {/* Modal de Eliminación */}
       <DeleteConfirmationModal
