@@ -2,6 +2,7 @@ package com.app.controller;
 
 import com.app.dto.ApiResponse;
 import com.app.model.Product;
+import com.app.model.User;
 import com.app.security.Secured;
 import com.app.service.ProductService;
 import jakarta.inject.Inject;
@@ -106,6 +107,7 @@ public class ProductController {
 	}
 
 	@DELETE
+	@Secured(roles = { User.Role.ADMIN })
 	@Path("/{id}")
 	public Response delete(@PathParam("id") Long id) {
 		LOG.infof("DELETE /api/v1/products/%d", id);

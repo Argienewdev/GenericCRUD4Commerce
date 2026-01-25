@@ -2,6 +2,7 @@ package com.app.controller;
 
 import com.app.dto.ApiResponse;
 import com.app.model.Client;
+import com.app.model.User;
 import com.app.security.Secured;
 import com.app.service.ClientService;
 import jakarta.inject.Inject;
@@ -59,7 +60,7 @@ public class ClientController {
 	public Response create(Client client) {
 		LOG.infof("POST /api/v1/clients - DNI: %s, Nombre: %s",
 				client.dni, client.name);
-		
+
 		try {
 			Client createdClient = clientService.createClient(client);
 			LOG.infof("Cliente creado exitosamente - ID: %d, DNI: %s",
@@ -137,6 +138,7 @@ public class ClientController {
 	}
 
 	@DELETE
+	@Secured(roles = { User.Role.ADMIN })
 	@Path("/{id}")
 	public Response delete(@PathParam("id") Long id) {
 		LOG.infof("DELETE /api/v1/clients/%d", id);

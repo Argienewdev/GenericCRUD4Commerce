@@ -57,6 +57,7 @@ public class SaleController {
   }
 
   @DELETE
+  @Secured(roles = { User.Role.ADMIN })
   @Path("/{id}")
   public Response delete(@PathParam("id") Long id) {
     // Solo elimina, no restaura stock
