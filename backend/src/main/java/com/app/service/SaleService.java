@@ -53,9 +53,12 @@ public class SaleService {
   public Sale createSale(SaleDTO saleDTO, User seller) {
     LOG.info("Iniciando creación de venta");
 
-    // 2. Validar stock de todos los productos primero (Atomicidad)
-    List<SaleItemTemp> itemsToProcess = new ArrayList<>();
+    List<SaleItem> itemsToProcess = new ArrayList<>();
     double total = 0;
+
+    Sale sale = new Sale();
+    sale.seller = seller;
+    sale.date = LocalDateTime.now();
 
     for (SaleDTO.SaleItemEntry entry : saleDTO.items) {
       Product product = productRepository.findById(entry.productId);
@@ -70,42 +73,22 @@ public class SaleService {
         throw new IllegalStateException("Stock insuficiente para producto: " + product.name);
       }
 
-      itemsToProcess.add(new SaleItemTemp(product, entry.quantity));
+      SaleItem saleItem = new SaleItem();
+      saleItem.sale = sale;
+      saleItem.product = product;
+      saleItem.quantity = entry.quantity;
+      saleItem.price = product.price;
+      product.stock -= saleItem.quantity;
+      productRepository.persist(product);
+      saleItemRepository.persist(saleItem);
+
+      itemsToProcess.add(saleItem);
       total += product.price * entry.quantity;
     }
-
-    // 3. Crear cabecera de venta
-    Sale sale = new Sale();
-    sale.seller = seller;
-    sale.date = LocalDateTime.now();
     sale.total = total;
     saleRepository.persist(sale);
 
-    // 4. Crear items y decrementar stock
-    for (SaleItemTemp itemTemp : itemsToProcess) {
-      SaleItem saleItem = new SaleItem();
-      saleItem.sale = sale;
-      saleItem.product = itemTemp.product;
-      saleItem.quantity = itemTemp.quantity;
-      saleItem.price = itemTemp.product.price; // Guardamos precio actual
-      saleItemRepository.persist(saleItem);
-
-      // Decrementar stock
-      itemTemp.product.stock -= itemTemp.quantity;
-      productRepository.persist(itemTemp.product);
-    }
-
     LOG.infof("Venta creada exitosamente - ID: %d, Total: %.2f", sale.id, sale.total);
     return sale;
-  }
-
-  private static class SaleItemTemp {
-    Product product;
-    int quantity;
-
-    SaleItemTemp(Product product, int quantity) {
-      this.product = product;
-      this.quantity = quantity;
-    }
   }
 }
