@@ -15,7 +15,6 @@ import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
@@ -53,12 +52,13 @@ public class SaleService {
   public Sale createSale(SaleDTO saleDTO, User seller) {
     LOG.info("Iniciando creación de venta");
 
-    List<SaleItem> itemsToProcess = new ArrayList<>();
     double total = 0;
 
     Sale sale = new Sale();
     sale.seller = seller;
     sale.date = LocalDateTime.now();
+		sale.total = 0.0;
+		saleRepository.persist(sale);
 
     for (SaleDTO.SaleItemEntry entry : saleDTO.items) {
       Product product = productRepository.findById(entry.productId);
@@ -79,14 +79,11 @@ public class SaleService {
       saleItem.quantity = entry.quantity;
       saleItem.price = product.price;
       product.stock -= saleItem.quantity;
-      productRepository.persist(product);
       saleItemRepository.persist(saleItem);
 
-      itemsToProcess.add(saleItem);
       total += product.price * entry.quantity;
     }
     sale.total = total;
-    saleRepository.persist(sale);
 
     LOG.infof("Venta creada exitosamente - ID: %d, Total: %.2f", sale.id, sale.total);
     return sale;
