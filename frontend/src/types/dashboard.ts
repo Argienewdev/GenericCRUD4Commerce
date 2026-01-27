@@ -19,7 +19,7 @@ export interface Sale {
   id: number;
   total: number;
   date: string;
-  seller: Seller;
+  seller: User;
 }
 
 export interface Client {
@@ -40,7 +40,7 @@ export interface StatCard {
 	color: "green" | "red" | "blue";
 }
 
-export interface Seller {
+export interface User {
 	id: number;
 	username: string;
 	//email: string;
