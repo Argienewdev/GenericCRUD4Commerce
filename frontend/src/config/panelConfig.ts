@@ -15,6 +15,7 @@ import { stockService } from "../services/stockService";
 import { salesService } from "../services/salesService";
 import { clientsService } from "../services/clientsService";
 import { usersService } from "../services/usersService";
+import { ProductModal } from "../components/modals/ProductModal";
 
 export type PanelType =
   | "stock"
@@ -31,6 +32,8 @@ export interface PanelConfig extends MenuItem {
   Component: React.ComponentType;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	fetchData?: () => Promise<any[]>
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	Modal?: React.ComponentType<any>;
 }
 
 export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
@@ -44,6 +47,7 @@ export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
     showSaleButton: true,
     Component: StockPanel,
 		fetchData: () => stockService.getStock(),
+		Modal: ProductModal,
   },
 
   ventas: {

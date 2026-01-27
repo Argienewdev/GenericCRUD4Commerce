@@ -1,8 +1,8 @@
 import { LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import type { PanelType } from '../../config/panelConfig';
 import type { MenuItem } from '../../types/dashboard';
+import type { PanelType } from '../../config/panelConfig';
 
 interface SidebarProps {
   isOpen: boolean;
