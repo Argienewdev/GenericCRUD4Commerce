@@ -36,13 +36,6 @@ export function StockPanel() {
         >
           Nuevo Producto
         </button>
-
-        <button
-          onClick={() => console.log("Abrir modal de Nueva Venta")}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md active:scale-95"
-        >
-          Nueva Venta
-        </button>
       </div>
 
       {/* Lista de productos */}

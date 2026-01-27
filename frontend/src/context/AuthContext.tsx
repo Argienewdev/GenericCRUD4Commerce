@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import { type UserInfo, type LoginRequest, type Role } from '../types/auth';
 import { authService } from '../services/authService';
 import { Spinner } from '../utils/Spinner';
-import { ErrorModal } from '../components/modals/ErrorModal';
 
 interface AuthContextType {
   user: UserInfo | null;
@@ -100,14 +99,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
       
       {/* Global error modal for authentication failures */}
-      <ErrorModal
+      {/* TODO
+			<ErrorModal
         isOpen={!!error}
         onClose={clearError}
         title="Error de Autenticación"
         message={error || ""}
         onRetry={retryAuth}
         retryLabel="Reintentar"
-      />
+      />*/}
     </AuthContext.Provider>
   );
 }

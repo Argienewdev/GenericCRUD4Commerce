@@ -5,7 +5,7 @@ import {
   BarChart3,
   UserCog,
 } from "lucide-react";
-import type { MenuItem } from "../types/dashboard";
+import type { Client, MenuItem, Sale, StockItem } from "../types/dashboard";
 import { StockPanel } from "../pages/panels/StockPanel";
 import { SalesPanel } from "../pages/panels/SalesPanel";
 import { ClientsPanel } from "../pages/panels/ClientsPanel";
@@ -15,8 +15,7 @@ import { stockService } from "../services/stockService";
 import { salesService } from "../services/salesService";
 import { clientsService } from "../services/clientsService";
 import { usersService } from "../services/usersService";
-import { ProductModal } from "../components/modals/ProductModal";
-import { ClientModal } from "../components/modals/ClientModal";
+import type { UserInfo } from "../types/auth";
 
 export type PanelType =
   | "stock"
@@ -25,16 +24,15 @@ export type PanelType =
   | "estadisticas"
   | "usuarios";
 
+type PanelData = StockItem | Sale | Client | UserInfo;
+
 export interface PanelConfig extends MenuItem {
   pageTitle: string;
   searchPlaceholder: string;
   newButtonLabel?: string;
   showSaleButton: boolean;
   Component: React.ComponentType;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fetchData?: () => Promise<any[]>
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	Modal?: React.ComponentType<any>;
+	fetchData?: () => Promise<PanelData[]>
 }
 
 export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
@@ -48,7 +46,6 @@ export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
     showSaleButton: true,
     Component: StockPanel,
 		fetchData: () => stockService.getStock(),
-		Modal: ProductModal,
   },
 
   ventas: {
@@ -73,7 +70,6 @@ export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
     showSaleButton: false,
     Component: ClientsPanel,
 		fetchData: () => clientsService.getClients(),
-		Modal: ClientModal,
   },
 
   estadisticas: {
