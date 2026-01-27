@@ -1,16 +1,20 @@
-import { 
-  Package, 
-  DollarSign, 
-  Users, 
-  BarChart3, 
-  UserCog, 
+import {
+  Package,
+  DollarSign,
+  Users,
+  BarChart3,
+  UserCog,
 } from "lucide-react";
+import type { MenuItem } from "../types/dashboard";
+import { StockPanel } from "../pages/panels/StockPanel";
+import { SalesPanel } from "../pages/panels/SalesPanel";
+import { ClientsPanel } from "../pages/panels/ClientsPanel";
+import { SellersPanel } from "../pages/panels/SellersPanel";
+import { StatsPanel } from "../pages/panels/StatsPanel";
 import { stockService } from "../services/stockService";
 import { salesService } from "../services/salesService";
 import { clientsService } from "../services/clientsService";
 import { usersService } from "../services/usersService";
-import type { StockItem, Sale, Client, MenuItem } from "../types/dashboard";
-import type { UserInfo } from "../types/auth";
 
 export type PanelType =
   | "stock"
@@ -19,70 +23,79 @@ export type PanelType =
   | "estadisticas"
   | "vendedores";
 
-type PanelData = StockItem | Sale | Client | UserInfo;
-
 export interface PanelConfig extends MenuItem {
-  fetchData?: () => Promise<PanelData[]>;
+  pageTitle: string;
+  searchPlaceholder: string;
   newButtonLabel?: string;
-  searchPlaceholder?: string;
-	pageTitle: string;
+  showSaleButton: boolean;
+  Component: React.ComponentType;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	fetchData?: () => Promise<any[]>
 }
 
 export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
   stock: {
     id: "stock",
     label: "Stock",
-		pageTitle: "Gestión de Stock",
     icon: Package,
-    fetchData: () => stockService.getStock(),
-    newButtonLabel: "Nuevo Producto",
+    pageTitle: "Gestión de Stock",
     searchPlaceholder: "Buscar producto...",
+    newButtonLabel: "Nuevo Producto",
+    showSaleButton: true,
+    Component: StockPanel,
+		fetchData: () => stockService.getStock(),
   },
-  
+
   ventas: {
     id: "ventas",
     label: "Ventas",
-		pageTitle: "Registro de Ventas",
     icon: DollarSign,
-    fetchData: () => salesService.getSales(),
-    newButtonLabel: "Nueva Venta",
+    pageTitle: "Registro de Ventas",
     searchPlaceholder: "Buscar venta...",
+    newButtonLabel: "Nueva Venta",
+    showSaleButton: false,
+    Component: SalesPanel,
+		fetchData: () => salesService.getSales(),
   },
-  
+
   clientes: {
     id: "clientes",
     label: "Clientes",
-		pageTitle: "Cartera de Clientes",
     icon: Users,
-    fetchData: () => clientsService.getClients(),
-    newButtonLabel: "Nuevo Cliente",
+    pageTitle: "Cartera de Clientes",
     searchPlaceholder: "Buscar cliente...",
+    newButtonLabel: "Nuevo Cliente",
+    showSaleButton: false,
+    Component: ClientsPanel,
+		fetchData: () => clientsService.getClients(),
   },
-  
+
   estadisticas: {
     id: "estadisticas",
     label: "Estadísticas",
-		pageTitle: "Estadísticas Generales",
     icon: BarChart3,
+    pageTitle: "Estadísticas Generales",
+    searchPlaceholder: "",
+    showSaleButton: false,
+    Component: StatsPanel,
   },
-  
+
   vendedores: {
     id: "vendedores",
     label: "Vendedores",
-		pageTitle: "Equipo de Ventas",
     icon: UserCog,
-    fetchData: () => usersService.getUsers(),
-    newButtonLabel: "Nuevo Vendedor",
+    pageTitle: "Equipo de Ventas",
     searchPlaceholder: "Buscar vendedor...",
+    newButtonLabel: "Nuevo Vendedor",
+    showSaleButton: false,
+    Component: SellersPanel,
+		fetchData: () => usersService.getUsers(),
   },
 };
 
 export const getMenuItems = (): MenuItem[] =>
-  Object.values(PANEL_CONFIG).map(
-    (item) => ({
-      id: item.id,
-      label: item.label,
-      icon: item.icon,
-    }) as MenuItem
-  );
- 
+  Object.values(PANEL_CONFIG).map(({ id, label, icon }) => ({
+    id,
+    label,
+    icon,
+  }));

@@ -244,7 +244,7 @@ export function SaleModal({ isOpen, onClose, onSave, products }: SaleModalProps)
                     type="button"
                     onClick={handleSubmit}
                     disabled={loading || cart.length === 0}
-                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all shadow-md shadow-blue-200 disabled:opacity-50 disabled:shadow-none min-w-[120px] text-sm"
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all shadow-md shadow-blue-200 disabled:opacity-50 disabled:shadow-none min-w-30 text-sm"
                   >
                     {loading ? "Procesando..." : "Finalizar Venta"}
                   </button>

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { type UserInfo, type LoginRequest, type Role } from '../types/auth';
 import { authService } from '../services/authService';
+import { Spinner } from '../utils/Spinner';
 
 interface AuthContextType {
   user: UserInfo | null;
@@ -65,13 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     hasRole,
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
+  if (loading) return <Spinner />;
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

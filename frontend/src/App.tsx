@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { Login } from "./pages/Login";
-import { Dashboard } from "./pages/Dashboard";
+import { Dashboard2 } from "./pages/Dashboard";
 import { ProtectedComponent } from "./components/routes/ProtectedComponent";
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
 						path="/dashboard"
 						element={
 							<ProtectedComponent>
-								<Dashboard />
+								<Dashboard2 />
 							</ProtectedComponent>
 						}
 					/>
