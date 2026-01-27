@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     hasRole,
   };
 
-  if (loading) return <Spinner />;
+  if (loading) return <Spinner fullScreen/>;
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

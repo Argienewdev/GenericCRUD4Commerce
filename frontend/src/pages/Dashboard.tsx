@@ -38,8 +38,6 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* ===== MODALES GLOBALES ===== */}
-
       <ProductModal
 				isOpen={isNewOpen && activePanel === "stock"}
 				onClose={() => setIsNewOpen(false)} onSave={function (): Promise<void> {
