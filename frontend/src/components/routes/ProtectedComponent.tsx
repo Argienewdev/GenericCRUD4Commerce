@@ -8,11 +8,11 @@ interface ProtectedRouteProps {
 	requiredRole?: Role;
 }
 
-export function ProtectedRoute({
+export function ProtectedComponent({
 	children,
 	requiredRole,
 }: ProtectedRouteProps) {
-	const { user, loading, isAuthenticated, hasRole } = useAuth();
+	const { loading, isAuthenticated, hasRole } = useAuth();
 
 	if (loading) {
 		return (
@@ -27,22 +27,7 @@ export function ProtectedRoute({
 	}
 
 	if (requiredRole && !hasRole(requiredRole)) {
-		return (
-			<div className="min-h-screen flex items-center justify-center bg-gray-50">
-				<div className="bg-white p-8 rounded-xl shadow-lg text-center">
-					<div className="text-red-500 text-6xl mb-4">🚫</div>
-					<h2 className="text-2xl font-bold text-gray-800 mb-2">
-						Acceso Denegado
-					</h2>
-					<p className="text-gray-600 mb-4">
-						No tienes permisos para acceder a esta sección
-					</p>
-					<p className="text-sm text-gray-500">
-						Tu rol actual: <span className="font-semibold">{user?.role}</span>
-					</p>
-				</div>
-			</div>
-		);
+		return null;
 	}
 
 	return <>{children}</>;
