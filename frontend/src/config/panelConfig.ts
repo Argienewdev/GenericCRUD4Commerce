@@ -9,7 +9,7 @@ import type { MenuItem } from "../types/dashboard";
 import { StockPanel } from "../pages/panels/StockPanel";
 import { SalesPanel } from "../pages/panels/SalesPanel";
 import { ClientsPanel } from "../pages/panels/ClientsPanel";
-import { SellersPanel } from "../pages/panels/SellersPanel";
+import { UsersPanel } from "../pages/panels/UsersPanel";
 import { StatsPanel } from "../pages/panels/StatsPanel";
 import { stockService } from "../services/stockService";
 import { salesService } from "../services/salesService";
@@ -23,7 +23,7 @@ export type PanelType =
   | "ventas"
   | "clientes"
   | "estadisticas"
-  | "vendedores";
+  | "usuarios";
 
 export interface PanelConfig extends MenuItem {
   pageTitle: string;
@@ -86,15 +86,15 @@ export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
     Component: StatsPanel,
   },
 
-  vendedores: {
-    id: "vendedores",
-    label: "Vendedores",
+  usuarios: {
+    id: "usuarios",
+    label: "Usuarios",
     icon: UserCog,
-    pageTitle: "Equipo de Ventas",
-    searchPlaceholder: "Buscar vendedor...",
-    newButtonLabel: "Nuevo Vendedor",
+    pageTitle: "Equipo",
+    searchPlaceholder: "Buscar usuario...",
+    newButtonLabel: "Nuevo Usuario",
     showSaleButton: false,
-    Component: SellersPanel,
+    Component: UsersPanel,
 		fetchData: () => usersService.getUsers(),
   },
 };
