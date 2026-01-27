@@ -1,7 +1,7 @@
 import { DollarSign, BarChart3 } from 'lucide-react';
 import { StatsCard } from '../../components/stats/StatsCard.tsx';
 import { type StatCard } from '../../types/dashboard.ts';
-import { SalesChart } from '../../components/sales/SalesChart.tsx';
+import { SalesChart } from '../../components/stats/charts/SalesChart.tsx';
 
 export function StatsPanel() {
   const stats: StatCard[] = [

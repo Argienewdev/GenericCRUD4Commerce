@@ -13,7 +13,7 @@ export function StockCard({ item, onEdit, onDelete }: StockCardProps) {
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-semibold text-slate-800">{item.name}</h3>
-          <p className="text-slate-600 mt-1 break-words">{item.description}</p>
+          <p className="text-slate-600 mt-1 wrap-break-word">{item.description}</p>
           <div className="flex items-center gap-6 mt-4">
             <span className="text-2xl font-bold text-blue-600">
               ${item.price.toLocaleString()}

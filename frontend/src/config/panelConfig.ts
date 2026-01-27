@@ -16,6 +16,7 @@ import { salesService } from "../services/salesService";
 import { clientsService } from "../services/clientsService";
 import { usersService } from "../services/usersService";
 import { ProductModal } from "../components/modals/ProductModal";
+import { ClientModal } from "../components/modals/ClientModal";
 
 export type PanelType =
   | "stock"
@@ -72,6 +73,7 @@ export const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
     showSaleButton: false,
     Component: ClientsPanel,
 		fetchData: () => clientsService.getClients(),
+		Modal: ClientModal,
   },
 
   estadisticas: {

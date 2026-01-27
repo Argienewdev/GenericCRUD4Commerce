@@ -5,7 +5,7 @@ import type { StockItem } from "../../types/dashboard";
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (product: Omit<StockItem, "id">) => Promise<void>;
+  onSave: (productData: Omit<StockItem, "id">) => Promise<void>;
   product?: StockItem; // Prop opcional para edición
 }
 
@@ -18,7 +18,7 @@ export function ProductModal({ isOpen, onClose, onSave, product }: ProductModalP
     stock: "",
   });
 
-  // Efecto para cargar datos si estamos editando
+  // Cargar datos si se está editando
   useEffect(() => {
     if (isOpen) {
       if (product) {
@@ -29,13 +29,7 @@ export function ProductModal({ isOpen, onClose, onSave, product }: ProductModalP
           stock: product.stock.toString(),
         });
       } else {
-        // Limpiar si es nuevo
-        setFormData({
-          name: "",
-          description: "",
-          price: "",
-          stock: "",
-        });
+        setFormData({ name: "", description: "", price: "", stock: "" });
       }
     }
   }, [isOpen, product]);
@@ -46,7 +40,6 @@ export function ProductModal({ isOpen, onClose, onSave, product }: ProductModalP
     e.preventDefault();
     setLoading(true);
     try {
-      // Conversiones importantes para que el Backend reciba números reales
       await onSave({
         name: formData.name,
         description: formData.description,
@@ -54,11 +47,10 @@ export function ProductModal({ isOpen, onClose, onSave, product }: ProductModalP
         stock: parseInt(formData.stock),
       });
 
-      // Limpiar y cerrar
       setFormData({ name: "", description: "", price: "", stock: "" });
       onClose();
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -73,7 +65,10 @@ export function ProductModal({ isOpen, onClose, onSave, product }: ProductModalP
           <h2 className="text-xl font-bold text-slate-800">
             {product ? "Editar Producto" : "Nuevo Producto"}
           </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 transition-colors"
+          >
             <X size={24} />
           </button>
         </div>
@@ -113,7 +108,7 @@ export function ProductModal({ isOpen, onClose, onSave, product }: ProductModalP
               <input
                 required
                 type="number"
-                step="0.01" // Permite centavos
+                step="0.01"
                 min="0"
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="0.00"
@@ -151,9 +146,10 @@ export function ProductModal({ isOpen, onClose, onSave, product }: ProductModalP
               disabled={loading}
               className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
             >
-              {loading ? "Guardando..." : (product ? "Guardar Cambios" : "Guardar Producto")}
+              {loading ? "Guardando..." : product ? "Guardar Cambios" : "Guardar Producto"}
             </button>
           </div>
+
         </form>
       </div>
     </div>
