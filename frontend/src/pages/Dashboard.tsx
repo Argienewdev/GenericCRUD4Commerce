@@ -5,7 +5,7 @@ import { PANEL_CONFIG, getMenuItems, type PanelType } from "../config/panelConfi
 import { ProductModal } from "../components/modals/ProductModal";
 import { SaleModal } from "../components/modals/SaleModal";
 
-export function Dashboard2() {
+export function Dashboard() {
   const [activePanel, setActivePanel] = useState<PanelType>("stock");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
