@@ -14,7 +14,7 @@ export function UserModal({ isOpen, onClose, onSave, user }: UserModalProps) {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    role: Role.VENDEDOR as string,
+    role: Role.VENDEDOR as Role,
   });
 
   useEffect(() => {
@@ -107,7 +107,7 @@ export function UserModal({ isOpen, onClose, onSave, user }: UserModalProps) {
             <select
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value as Role })}
             >
               <option value={Role.VENDEDOR}>Vendedor</option>
               <option value={Role.ADMIN}>Administrador</option>
