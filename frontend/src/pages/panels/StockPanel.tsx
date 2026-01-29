@@ -6,13 +6,16 @@ import type { StockItem } from "../../types/dashboard";
 import { Spinner } from "../../utils/Spinner";
 import { ErrorModal } from "../../components/modals/ErrorModal";
 import { usePanel } from "../../hooks/usePanel";
+import { DeleteConfirmationModal } from "../../components/modals/DeleteConfirmationModal";
 
 export function StockPanel() {
   const { data, loading, error, refetch } = usePanel<StockItem>("stock");
 
   const [selectedProduct, setSelectedProduct] = useState<StockItem | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Create/Edit
   const [showError, setShowError] = useState(true);
+  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); //Delete confirmation
 
   if (loading) return <Spinner />;
 
@@ -22,6 +25,11 @@ export function StockPanel() {
     } else {
       await stockService.createProduct(productData);
     }
+    await refetch();
+  };
+
+  const handleDelete = async (id: number) => {
+    await stockService.deleteProduct(id);
     await refetch();
   };
 
@@ -45,9 +53,12 @@ export function StockPanel() {
           setSelectedProduct(product);
           setIsModalOpen(true);
         }}
-        onDelete={async (id) => {
-          await stockService.deleteProduct(id);
-          await refetch();
+        onDelete={(id) => {
+          const product = data.find(p => p.id === id);
+          if (product) {
+            setSelectedProduct(product);
+            setIsDeleteModalOpen(true);
+          }
         }}
       />
 
@@ -71,6 +82,22 @@ export function StockPanel() {
           setShowError(false);
           refetch();
         }}
+      />
+
+      {/* Modal de confirmación de eliminación */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedProduct(null);
+        }}
+        onConfirm={async () => {
+          if (selectedProduct) {
+            await handleDelete(selectedProduct.id);
+          }
+        }}
+        title="Eliminar Producto"
+        description={`¿Estás seguro de que deseas eliminar el producto? Esta acción no se puede deshacer y el producto será removido permanentemente del inventario.`}
       />
     </div>
   );
