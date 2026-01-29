@@ -97,7 +97,7 @@ export function StockPanel() {
           }
         }}
         title="Eliminar Producto"
-        description={`¿Estás seguro de que deseas eliminar el producto? Esta acción no se puede deshacer y el producto será removido permanentemente del inventario.`}
+        description={`¿Estás seguro de que deseas eliminar "${selectedProduct?.name}"? Esta acción no se puede deshacer y el producto será removido permanentemente del inventario.`}
       />
     </div>
   );
