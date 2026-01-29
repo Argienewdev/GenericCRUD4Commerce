@@ -41,7 +41,7 @@ public class SaleService {
 
   @Transactional
   public boolean deleteSale(Long id) {
-    LOG.infof("Eliminando venta con ID: %d", id);
+    LOG.debugf("Eliminando venta con ID: %d", id);
     // Nota: Ahora configurado con cascade en la entidad Sale,
     // borrando la venta se borran automáticamente sus items.
     // NO SE RESTAURA EL STOCK
@@ -50,15 +50,15 @@ public class SaleService {
 
   @Transactional
   public Sale createSale(SaleDTO saleDTO, User seller) {
-    LOG.info("Iniciando creación de venta");
+    LOG.debug("Iniciando creación de venta");
 
     double total = 0;
 
     Sale sale = new Sale();
     sale.seller = seller;
     sale.date = LocalDateTime.now();
-		sale.total = 0.0;
-		saleRepository.persist(sale);
+    sale.total = 0.0;
+    saleRepository.persist(sale);
 
     for (SaleDTO.SaleItemEntry entry : saleDTO.items) {
       Product product = productRepository.findById(entry.productId);
@@ -85,7 +85,7 @@ public class SaleService {
     }
     sale.total = total;
 
-    LOG.infof("Venta creada exitosamente - ID: %d, Total: %.2f", sale.id, sale.total);
+    LOG.debugf("Venta creada exitosamente - ID: %d, Total: %.2f", sale.id, sale.total);
     return sale;
   }
 }

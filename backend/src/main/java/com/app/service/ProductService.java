@@ -30,11 +30,11 @@ public class ProductService {
 
 	@Transactional
 	public Product createProduct(Product product) {
-		LOG.infof("Creando producto: %s, Precio: %.2f", product.name, product.price);
+		LOG.debugf("Creando producto: %s, Precio: %.2f", product.name, product.price);
 
 		productRepository.persist(product);
 
-		LOG.infof("Producto creado exitosamente - ID: %d, Nombre: %s",
+		LOG.debugf("Producto creado exitosamente - ID: %d, Nombre: %s",
 				product.id, product.name);
 
 		return product;
@@ -57,7 +57,7 @@ public class ProductService {
 
 	@Transactional
 	public Optional<Product> updateProduct(Long id, Product newData) {
-		LOG.infof("Actualizando producto con ID: %d", id);
+		LOG.debugf("Actualizando producto con ID: %d", id);
 
 		Product entity = productRepository.findById(id);
 
@@ -73,7 +73,7 @@ public class ProductService {
 
 		productRepository.persist(entity);
 
-		LOG.infof("Producto actualizado exitosamente - ID: %d, Nombre: %s",
+		LOG.debugf("Producto actualizado exitosamente - ID: %d, Nombre: %s",
 				entity.id, entity.name);
 
 		return Optional.of(entity);
@@ -81,7 +81,7 @@ public class ProductService {
 
 	@Transactional
 	public boolean deleteProduct(Long id) {
-		LOG.infof("Eliminando producto con ID: %d", id);
+		LOG.debugf("Eliminando producto con ID: %d", id);
 
 		boolean deleted = productRepository.deleteById(id);
 
@@ -90,7 +90,7 @@ public class ProductService {
 			return false;
 		}
 
-		LOG.infof("Producto eliminado exitosamente - ID: %d", id);
+		LOG.debugf("Producto eliminado exitosamente - ID: %d", id);
 
 		return true;
 	}

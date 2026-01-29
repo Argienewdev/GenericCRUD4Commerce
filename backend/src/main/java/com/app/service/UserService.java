@@ -22,7 +22,7 @@ public class UserService {
 
 	@Transactional
 	public User createUser(CreateUserRequest request) {
-		LOG.infof("Creando usuario: %s con rol: %s", request.username(), request.role());
+		LOG.debugf("Creando usuario: %s con rol: %s", request.username(), request.role());
 
 		// Validar que no exista un usuario con el mismo username
 		Optional<User> existingUser = userRepository.findByUsername(request.username());
@@ -39,7 +39,7 @@ public class UserService {
 
 		userRepository.persist(user);
 
-		LOG.infof("Usuario creado exitosamente: %s (ID: %d)", user.getUsername(), user.getId());
+		LOG.debugf("Usuario creado exitosamente: %s (ID: %d)", user.getUsername(), user.getId());
 
 		return user;
 	}
@@ -71,7 +71,7 @@ public class UserService {
 
 	@Transactional
 	public boolean deactivateUser(Long id) {
-		LOG.infof("Desactivando usuario con ID: %d", id);
+		LOG.debugf("Desactivando usuario con ID: %d", id);
 
 		Optional<User> userOpt = userRepository.findByIdOptional(id);
 
@@ -91,7 +91,7 @@ public class UserService {
 		user.setActive(false);
 		userRepository.persist(user);
 
-		LOG.infof("Usuario desactivado exitosamente: %s (ID: %d)",
+		LOG.debugf("Usuario desactivado exitosamente: %s (ID: %d)",
 				user.getUsername(), id);
 
 		return true;
@@ -99,7 +99,7 @@ public class UserService {
 
 	@Transactional
 	public boolean activateUser(Long id) {
-		LOG.infof("Activando usuario con ID: %d", id);
+		LOG.debugf("Activando usuario con ID: %d", id);
 
 		Optional<User> userOpt = userRepository.findByIdOptional(id);
 
@@ -119,7 +119,7 @@ public class UserService {
 		user.setActive(true);
 		userRepository.persist(user);
 
-		LOG.infof("Usuario activado exitosamente: %s (ID: %d)",
+		LOG.debugf("Usuario activado exitosamente: %s (ID: %d)",
 				user.getUsername(), id);
 
 		return true;
@@ -127,7 +127,7 @@ public class UserService {
 
 	@Transactional
 	public Optional<User> updateUserRole(Long id, User.Role newRole) {
-		LOG.infof("Actualizando rol de usuario ID: %d a rol: %s", id, newRole);
+		LOG.debugf("Actualizando rol de usuario ID: %d a rol: %s", id, newRole);
 
 		Optional<User> userOpt = userRepository.findByIdOptional(id);
 
@@ -141,7 +141,7 @@ public class UserService {
 		user.setRole(newRole);
 		userRepository.persist(user);
 
-		LOG.infof("Rol de usuario actualizado exitosamente: %s (ID: %d) - %s -> %s",
+		LOG.debugf("Rol de usuario actualizado exitosamente: %s (ID: %d) - %s -> %s",
 				user.getUsername(), id, oldRole, newRole);
 
 		return Optional.of(user);
@@ -149,7 +149,7 @@ public class UserService {
 
 	@Transactional
 	public Optional<User> updateUser(Long id, CreateUserRequest request) {
-		LOG.infof("Actualizando usuario ID: %d - Username: %s, Role: %s",
+		LOG.debugf("Actualizando usuario ID: %d - Username: %s, Role: %s",
 				id, request.username(), request.role());
 
 		Optional<User> userOpt = userRepository.findByIdOptional(id);
@@ -178,7 +178,7 @@ public class UserService {
 		user.setRole(request.role());
 		userRepository.persist(user);
 
-		LOG.infof("Usuario actualizado exitosamente: %s (ID: %d)",
+		LOG.debugf("Usuario actualizado exitosamente: %s (ID: %d)",
 				user.getUsername(), id);
 
 		return Optional.of(user);

@@ -30,7 +30,7 @@ public class ClientService {
 
 	@Transactional
 	public Client createClient(Client client) {
-		LOG.infof("Creando cliente: DNI %s, Nombre: %s", client.dni, client.name);
+		LOG.debugf("Creando cliente: DNI %s, Nombre: %s", client.dni, client.name);
 
 		if (clientRepository.existsByDni(client.dni)) {
 			LOG.warnf("Intento de crear cliente con DNI duplicado: %s", client.dni);
@@ -39,7 +39,7 @@ public class ClientService {
 
 		clientRepository.persist(client);
 
-		LOG.infof("Cliente creado exitosamente - ID: %d, DNI: %s", client.id, client.dni);
+		LOG.debugf("Cliente creado exitosamente - ID: %d, DNI: %s", client.id, client.dni);
 
 		return client;
 	}
@@ -75,7 +75,7 @@ public class ClientService {
 
 	@Transactional
 	public Optional<Client> updateClient(Long id, Client newData) {
-		LOG.infof("Actualizando cliente con ID: %d", id);
+		LOG.debugf("Actualizando cliente con ID: %d", id);
 
 		Client entity = clientRepository.findById(id);
 
@@ -90,7 +90,7 @@ public class ClientService {
 
 		clientRepository.persist(entity);
 
-		LOG.infof("Cliente actualizado exitosamente - ID: %d, DNI: %s",
+		LOG.debugf("Cliente actualizado exitosamente - ID: %d, DNI: %s",
 				entity.id, entity.dni);
 
 		return Optional.of(entity);
@@ -98,7 +98,7 @@ public class ClientService {
 
 	@Transactional
 	public boolean deleteClient(Long id) {
-		LOG.infof("Eliminando cliente con ID: %d", id);
+		LOG.debugf("Eliminando cliente con ID: %d", id);
 
 		boolean deleted = clientRepository.deleteById(id);
 
@@ -107,7 +107,7 @@ public class ClientService {
 			return false;
 		}
 
-		LOG.infof("Cliente eliminado exitosamente - ID: %d", id);
+		LOG.debugf("Cliente eliminado exitosamente - ID: %d", id);
 
 		return true;
 	}

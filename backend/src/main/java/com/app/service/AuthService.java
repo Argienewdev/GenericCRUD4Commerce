@@ -29,7 +29,7 @@ public class AuthService {
 
 	@Transactional
 	public Optional<Session> login(LoginRequest loginRequest) {
-		LOG.infof("Intento de login para usuario: %s", loginRequest.username());
+		LOG.debugf("Intento de login para usuario: %s", loginRequest.username());
 
 		Optional<User> userOpt = userRepository.findByUsername(loginRequest.username());
 
@@ -49,7 +49,7 @@ public class AuthService {
 		session.setUser(user);
 		sessionRepository.persist(session);
 
-		LOG.infof("Login exitoso para usuario: %s (ID: %d, Role: %s). Session ID: %s",
+		LOG.debugf("Login exitoso para usuario: %s (ID: %d, Role: %s). Session ID: %s",
 				loginRequest.username(), user.getId(), user.getRole(), session.getId());
 
 		return Optional.of(session);
@@ -57,7 +57,7 @@ public class AuthService {
 
 	@Transactional
 	public boolean logout(String sessionIdString) {
-		LOG.infof("Intento de logout. Session ID: %s", sessionIdString);
+		LOG.debugf("Intento de logout. Session ID: %s", sessionIdString);
 
 		try {
 			UUID sessionId = UUID.fromString(sessionIdString);
@@ -69,7 +69,7 @@ public class AuthService {
 			}
 
 			sessionRepository.delete(sessionOpt.get());
-			LOG.infof("Logout exitoso. Session ID: %s", sessionId);
+			LOG.debugf("Logout exitoso. Session ID: %s", sessionId);
 
 			return true;
 
