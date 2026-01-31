@@ -25,10 +25,10 @@ export function ErrorModal({
 
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-100">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="text-red-500" size={22} />
-            <h2 className="text-xl font-bold text-slate-800">{title}</h2>
-          </div>
+          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <AlertTriangle className="text-red-500" size={24} />
+            {title}
+          </h2>
 
           <button
             onClick={onClose}
@@ -40,28 +40,28 @@ export function ErrorModal({
 
         {/* Body */}
         <div className="p-6">
-          <p className="text-slate-600 text-sm leading-relaxed">
+          <p className="text-slate-600 mb-6 font-medium">
             {message}
           </p>
-        </div>
 
         {/* Footer */}
-        <div className="flex gap-3 p-6 pt-0">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition-colors"
-          >
-            Cerrar
-          </button>
-
-          {onRetry && (
+          <div className="flex gap-3">
             <button
-              onClick={onRetry}
-              className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors active:scale-95"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition-colors"
             >
-              {retryLabel}
+              Cerrar
             </button>
-          )}
+  
+            {onRetry && (
+              <button
+                onClick={onRetry}
+                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex justify-center"
+              >
+                {retryLabel}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
