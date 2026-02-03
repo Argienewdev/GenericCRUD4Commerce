@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.WebApplicationException;
 import org.jboss.logging.Logger;
 
 import java.util.List;
@@ -124,6 +125,9 @@ public class ProductController {
 
 			LOG.infof("Producto eliminado exitosamente - ID: %d", id);
 			return Response.noContent().build();
+		} catch (WebApplicationException e) {
+			LOG.warnf("Error de negocio al eliminar producto con ID: %d - %s", id, e.getMessage());
+			return e.getResponse();
 		} catch (Exception e) {
 			LOG.errorf(e, "Error al eliminar producto con ID: %d", id);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

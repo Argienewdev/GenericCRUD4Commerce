@@ -2,9 +2,12 @@ package com.app.service;
 
 import com.app.model.Product;
 import com.app.repository.ProductRepository;
+import com.app.repository.SaleItemRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 import java.util.List;
@@ -17,6 +20,9 @@ public class ProductService {
 
 	@Inject
 	ProductRepository productRepository;
+
+	@Inject
+	SaleItemRepository saleItemRepository;
 
 	public List<Product> getAllProducts() {
 		LOG.debug("Obteniendo lista de todos los productos");
@@ -82,6 +88,14 @@ public class ProductService {
 	@Transactional
 	public boolean deleteProduct(Long id) {
 		LOG.debugf("Eliminando producto con ID: %d", id);
+
+		if (saleItemRepository.isProductInAnySale(id)) {
+			LOG.warnf("No se puede eliminar el producto con ID: %d porque está asociado a una o más ventas", id);
+			throw new WebApplicationException(
+					Response.status(Response.Status.CONFLICT)
+							.entity("No se puede eliminar el producto porque tiene ventas asociadas.")
+							.build());
+		}
 
 		boolean deleted = productRepository.deleteById(id);
 

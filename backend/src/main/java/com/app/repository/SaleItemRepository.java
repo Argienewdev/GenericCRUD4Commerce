@@ -6,4 +6,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class SaleItemRepository implements PanacheRepository<SaleItem> {
+
+  public boolean isProductInAnySale(Long productId) {
+    return count("product.id", productId) > 0;
+  }
 }
