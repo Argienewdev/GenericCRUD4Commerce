@@ -13,6 +13,7 @@ export function StockPanel() {
 
   const [selectedProduct, setSelectedProduct] = useState<StockItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // Create/Edit
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [showError, setShowError] = useState(true);
   
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); //Delete confirmation
@@ -29,8 +30,22 @@ export function StockPanel() {
   };
 
   const handleDelete = async (id: number) => {
-    await stockService.deleteProduct(id);
-    await refetch();
+    try {
+      setDeleteError(null);
+      await stockService.deleteProduct(id);
+      await refetch();
+      setIsDeleteModalOpen(false);
+      setSelectedProduct(null);
+    } catch (err: unknown) {
+      console.error("Error deleting product:", err);
+      const apiError = err as { status?: number; message?: string };
+      if (apiError.status === 409){
+        setDeleteError("No se pudo eliminar el producto debido a que alguna vez fue vendido.");
+      }else{
+        setDeleteError(apiError.message || "No se pudo eliminar el producto");
+      }
+      setShowError(true);
+    }
   };
 
   return (
@@ -75,11 +90,15 @@ export function StockPanel() {
 
       {/* Modal de error */}
       <ErrorModal
-        isOpen={!!error && showError}
-        onClose={() => setShowError(false)}
-        message={error ?? ""}
+        isOpen={(!!error || !!deleteError) && showError}
+        onClose={() => {
+          setShowError(false);
+          setDeleteError(null);
+        }}
+        message={deleteError || error || ""}
         onRetry={() => {
           setShowError(false);
+          setDeleteError(null);
           refetch();
         }}
       />
